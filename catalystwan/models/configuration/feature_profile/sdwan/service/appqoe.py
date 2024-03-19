@@ -112,7 +112,7 @@ class Appqoe(BaseModel):
 
 class ServiceContext(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    appqoe: List[Appqoe]
+    appqoe: List[Appqoe] = Field(default_factory=lambda: [Appqoe()])
 
 
 # Frowarder
@@ -161,7 +161,9 @@ class ForwarderRole(BaseModel):
     service_node_group: List[ForwarderNodeGroup] = Field(
         serialization_alias="serviceNodeGroup", validation_alias="serviceNodeGroup"
     )
-    service_context: ServiceContext = Field(serialization_alias="serviceContext", validation_alias="serviceContext")
+    service_context: ServiceContext = Field(
+        default_factory=ServiceContext, serialization_alias="serviceContext", validation_alias="serviceContext"
+    )
 
 
 # Forwarder and Service
@@ -248,6 +250,7 @@ class ServiceNodeRole(BaseModel):
 
 
 class AppqoeParcel(_ParcelBase):
+    type_: Literal["appqoe"] = Field(default="appqoe", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     dreopt: Optional[Union[Global[bool], Default[bool]]] = Field(

@@ -10,7 +10,13 @@ from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationResponse,
     FeatureProfileInfo,
     GetFeatureProfilesPayload,
+    ParcelCreationResponse,
 )
+from catalystwan.models.configuration.feature_profile.sdwan.service import (
+    AnyLanVpnInterfaceParcel,
+    AnyTopLevelServiceParcel,
+)
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnParcel
 from catalystwan.typed_list import DataSequence
 
 
@@ -30,6 +36,25 @@ class ServiceFeatureProfile(APIEndpoints):
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
-    @delete("/v1/feature-profile/sdwan/service/{profile_id}")
-    def delete_sdwan_service_feature_profile(self, profile_id: UUID) -> None:
+    @delete("/v1/feature-profile/sdwan/service/{profile_uuid}")
+    def delete_sdwan_service_feature_profile(self, profile_uuid: UUID) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{profile_uuid}/{parcel_type}")
+    def create_top_level_service_parcel(
+        self, profile_uuid: UUID, parcel_type: str, payload: AnyTopLevelServiceParcel
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{profile_uuid}/lan/vpn/")
+    def create_lan_vpn_service_parcel(self, profile_uuid: UUID, payload: LanVpnParcel) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{profile_uuid}/lan/vpn/{vpn_uuid}/interface/{parcel_type}")
+    def create_lan_vpn_interface_parcel(
+        self, profile_uuid: UUID, vpn_uuid: UUID, parcel_type: str, payload: AnyLanVpnInterfaceParcel
+    ) -> ParcelCreationResponse:
         ...

@@ -9,6 +9,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.dhcp_server 
     LanVpnDhcpServerParcel,
     SubnetMask,
 )
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnParcel
 from catalystwan.session import create_manager_session
 
 
@@ -26,7 +27,6 @@ class TestServiceFeatureProfileModels(unittest.TestCase):
 
     def test_when_default_values_dhcp_server_parcel_expect_successful_post(self):
         # Arrange
-        url = f"dataservice/v1/feature-profile/sdwan/service/{self.profile_id}/dhcp-server"
         dhcp_server_parcel = LanVpnDhcpServerParcel(
             parcel_name="DhcpServerDefault",
             parcel_description="Dhcp Server Parcel",
@@ -36,11 +36,23 @@ class TestServiceFeatureProfileModels(unittest.TestCase):
             ),
         )
         # Act
-        response = self.session.post(
-            url=url, data=dhcp_server_parcel.model_dump_json(by_alias=True, exclude_none=True)
-        )  # This will be changed to the actual method
+        parcel_id = self.session.api.sdwan_feature_profiles.service.create_parcel(
+            self.profile_id, dhcp_server_parcel
+        ).id
         # Assert
-        assert response.status_code == 200
+        assert parcel_id
+
+    def test_when_default_values_service_vpn_parcel_expect_successful_post(self):
+        # Arrange
+        vpn_parcel = LanVpnParcel(
+            parcel_name="TestVpnParcel",
+            parcel_description="Test Vpn Parcel",
+            vpn_id=Global[int](value=2),
+        )
+        # Act
+        parcel_id = self.session.api.sdwan_feature_profiles.service.create_parcel(self.profile_id, vpn_parcel).id
+        # Assert
+        assert parcel_id
 
     def tearDown(self) -> None:
         self.session.api.sdwan_feature_profiles.service.delete_profile(self.profile_id)

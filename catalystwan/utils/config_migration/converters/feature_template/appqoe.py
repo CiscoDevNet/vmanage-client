@@ -26,6 +26,7 @@ class AppqoeTemplateConverter:
             AppqoeParcel: The created AppqoeParcel object.
         """
         values = deepcopy(template_values)
+        print(values)
         for appqoe_item in values.get("service_context", {}).get("appqoe", []):
             if item_name := appqoe_item.get("name"):
                 appqoe_item["name"] = as_default(value=item_name.value)

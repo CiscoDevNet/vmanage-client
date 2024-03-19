@@ -24,6 +24,7 @@ from .omp import OMPTemplateConverter
 from .security import SecurityTemplateConverter
 from .thousandeyes import ThousandEyesTemplateConverter
 from .ucse import UcseTemplateConverter
+from .vpn import LanVpnParcelTemplateConverter
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ available_converters = [
     DhcpTemplateConverter,
     SNMPTemplateConverter,
     AppqoeTemplateConverter,
+    LanVpnParcelTemplateConverter,
 ]
 
 

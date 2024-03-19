@@ -4,7 +4,7 @@ from typing import Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common import (
     IkeCiphersuite,
     IkeGroup,
@@ -190,17 +190,9 @@ class AdvancedGre(BaseModel):
     application: Optional[Union[Global[TunnelApplication], Variable]] = None
 
 
-class InterfaceGreData(BaseModel):
+class InterfaceGreData(_ParcelBase):
+    type_: Literal["gre"] = Field(default="gre", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     basic: BasicGre
     advanced: Optional[AdvancedGre] = None
-
-
-class InterfaceGreCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: InterfaceGreData
-    metadata: Optional[dict] = None

@@ -89,6 +89,10 @@ class Global(ParcelAttribute, Generic[T]):
     )
     value: T
 
+    def __bool__(self) -> bool:
+        # if statements use __len__ when __bool__ is not defined
+        return True
+
     def __len__(self) -> int:
         if isinstance(self.value, (str, list)):
             return len(self.value)

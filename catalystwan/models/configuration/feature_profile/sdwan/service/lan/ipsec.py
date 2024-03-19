@@ -4,7 +4,7 @@ from typing import Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common import (
     IkeCiphersuite,
     IkeGroup,
@@ -28,7 +28,8 @@ class IpsecAddress(BaseModel):
     mask: Union[Variable, Global[str]]
 
 
-class InterfaceIpsecData(BaseModel):
+class InterfaceIpsecData(_ParcelBase):
+    type_: Literal["ipsec"] = Field(default="ipsec", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     interface_name: Union[Global[str], Variable] = Field(serialization_alias="ifName", validation_alias="ifName")
@@ -128,11 +129,3 @@ class InterfaceIpsecData(BaseModel):
     tunnel_route_via: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         serialization_alias="tunnelRouteVia", validation_alias="tunnelRouteVia", default=None
     )
-
-
-class InterfaceIpsecCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: InterfaceIpsecData

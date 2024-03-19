@@ -1,11 +1,11 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common import (
     Arp,
     StaticIPv4Address,
@@ -140,7 +140,8 @@ class AclQos(BaseModel):
     )
 
 
-class InterfaceSviData(BaseModel):
+class InterfaceSviData(_ParcelBase):
+    type_: Literal["svi"] = Field(default="svi", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     shutdown: Union[Global[bool], Variable, Default[bool]] = Default[bool](value=True)
@@ -166,12 +167,3 @@ class InterfaceSviData(BaseModel):
         serialization_alias="dhcpClientV6", validation_alias="dhcpClientV6", default=Default[bool](value=False)
     )
     advanced: AdvancedSviAttributes = AdvancedSviAttributes()
-
-
-class InterfaceSviCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: InterfaceSviData
-    metadata: Optional[dict] = None
