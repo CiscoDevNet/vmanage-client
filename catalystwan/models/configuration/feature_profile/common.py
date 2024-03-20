@@ -1,6 +1,7 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
 from datetime import datetime
+from ipaddress import IPv4Address
 from typing import Generic, List, Literal, Optional, TypeVar, Union
 from uuid import UUID
 
@@ -160,7 +161,7 @@ class ParcelAssociationPayload(BaseModel):
 
 
 class Prefix(BaseModel):
-    address: Union[Variable, Global[str]]
+    address: Union[Variable, Global[str], Global[IPv4Address], Global[IPv6Address]]
     mask: Union[Variable, Global[str]]
 
 

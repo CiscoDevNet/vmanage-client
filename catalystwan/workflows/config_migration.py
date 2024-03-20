@@ -50,6 +50,7 @@ SUPPORTED_TEMPLATE_TYPES = [
     "ucse",
     "dhcp",
     "cisco_dhcp_server",
+    "cisco_vpn",
 ]
 
 FEATURE_PROFILE_SYSTEM = [
