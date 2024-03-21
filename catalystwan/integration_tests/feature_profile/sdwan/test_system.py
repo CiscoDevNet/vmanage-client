@@ -1,7 +1,4 @@
-import os
-import unittest
-from typing import cast
-
+from catalystwan.integration_tests.feature_profile.sdwan.base import TestFeatureProfileModels
 from catalystwan.models.configuration.feature_profile.sdwan.system import (
     BannerParcel,
     BasicParcel,
@@ -14,18 +11,13 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import (
     SecurityParcel,
     SNMPParcel,
 )
-from catalystwan.session import create_manager_session
 
 
-class TestSystemFeatureProfileModels(unittest.TestCase):
+class TestSystemFeatureProfileModels(TestFeatureProfileModels):
     def setUp(self) -> None:
-        self.session = create_manager_session(
-            url=cast(str, os.environ.get("TEST_VMANAGE_URL")),
-            port=cast(int, int(os.environ.get("TEST_VMANAGE_PORT"))),  # type: ignore
-            username=cast(str, os.environ.get("TEST_VMANAGE_USERNAME")),
-            password=cast(str, os.environ.get("TEST_VMANAGE_PASSWORD")),
-        )
-        self.profile_id = self.session.api.sdwan_feature_profiles.system.create_profile("TestProfile", "Description").id
+        super().setUp()
+        self.api = self.session.api.sdwan_feature_profiles.system
+        self.profile_id = self.api.create_profile("TestProfile", "Description").id
 
     def test_when_default_values_banner_parcel_expect_successful_post(self):
         # Arrange
@@ -34,7 +26,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="Banner Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, banner_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, banner_parcel).id
         # Assert
         assert parcel_id
 
@@ -47,7 +39,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
         banner_parcel.add_login("Login")
         banner_parcel.add_motd("Hello! Welcome to the network!")
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, banner_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, banner_parcel).id
         # Assert
         assert parcel_id
 
@@ -58,7 +50,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="Logging Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, logging_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, logging_parcel).id
         # Assert
         assert parcel_id
 
@@ -102,7 +94,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             profile_properties="TLSProfile",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, logging_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, logging_parcel).id
         # Assert
         assert parcel_id
 
@@ -113,7 +105,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="BFD Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, bfd_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, bfd_parcel).id
         # Assert
         assert parcel_id
 
@@ -131,7 +123,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
         bfd_parcel.add_color(color="biz-internet")
         bfd_parcel.add_color(color="public-internet")
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, bfd_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, bfd_parcel).id
         # Assert
         assert parcel_id
 
@@ -142,7 +134,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="Basic Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, basic_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, basic_parcel).id
         # Assert
         assert parcel_id
 
@@ -153,7 +145,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="Security Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, security_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, security_parcel).id
         # Assert
         assert parcel_id
 
@@ -164,7 +156,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="NTP Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, ntp_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, ntp_parcel).id
         # Assert
         assert parcel_id
 
@@ -175,7 +167,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="Global Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, global_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, global_parcel).id
         # Assert
         assert parcel_id
 
@@ -186,7 +178,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="MRF Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, mrf_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, mrf_parcel).id
         # Assert
         assert parcel_id
 
@@ -197,7 +189,7 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="SNMP Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, snmp_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, snmp_parcel).id
         # Assert
         assert parcel_id
 
@@ -208,10 +200,10 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
             parcel_description="OMP Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.system.create_parcel(self.profile_id, omp_parcel).id
+        parcel_id = self.api.create_parcel(self.profile_id, omp_parcel).id
         # Assert
         assert parcel_id
 
     def tearDown(self) -> None:
-        self.session.api.sdwan_feature_profiles.system.delete_profile(self.profile_id)
+        self.api.delete_profile(self.profile_id)
         self.session.close()

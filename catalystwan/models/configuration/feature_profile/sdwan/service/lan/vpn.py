@@ -578,7 +578,7 @@ class MplsVpnIPv6RouteTarget(BaseModel):
 
 
 class LanVpnParcel(_ParcelBase):
-    type_: Literal["vpn"] = Field(default="vpn", exclude=True)
+    type_: Literal["lan/vpn"] = Field(default="lan/vpn", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     vpn_id: Union[Variable, Global[int], Default[int]] = Field(

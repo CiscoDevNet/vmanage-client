@@ -1,22 +1,14 @@
-import os
-import unittest
-from typing import cast
-
 from catalystwan.api.configuration_groups.parcel import Global, as_global
+from catalystwan.integration_tests.feature_profile.sdwan.base import TestFeatureProfileModels
 from catalystwan.models.configuration.feature_profile.sdwan.other import ThousandEyesParcel, UcseParcel
 from catalystwan.models.configuration.feature_profile.sdwan.other.ucse import AccessPort, Imc, LomType, SharedLom
-from catalystwan.session import create_manager_session
 
 
-class TestSystemOtherProfileModels(unittest.TestCase):
+class TestSystemOtherProfileModels(TestFeatureProfileModels):
     def setUp(self) -> None:
-        self.session = create_manager_session(
-            url=cast(str, os.environ.get("TEST_VMANAGE_URL")),
-            port=cast(int, int(os.environ.get("TEST_VMANAGE_PORT"))),  # type: ignore
-            username=cast(str, os.environ.get("TEST_VMANAGE_USERNAME")),
-            password=cast(str, os.environ.get("TEST_VMANAGE_PASSWORD")),
-        )
-        self.profile_id = self.session.api.sdwan_feature_profiles.other.create_profile("TestProfile", "Description").id
+        super().setUp()
+        self.api = self.session.api.sdwan_feature_profiles.other
+        self.profile_id = self.api.create_profile("TestProfile", "Description").id
 
     def test_when_default_values_thousandeyes_parcel_expect_successful_post(self):
         # Arrange
@@ -25,7 +17,7 @@ class TestSystemOtherProfileModels(unittest.TestCase):
             parcel_description="ThousandEyes Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.other.create_parcel(self.profile_id, te_parcel).id
+        parcel_id = self.api.create_parcel(te_parcel, self.profile_id).id
         # Assert
         assert parcel_id
 
@@ -45,10 +37,10 @@ class TestSystemOtherProfileModels(unittest.TestCase):
             ),
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.other.create_parcel(self.profile_id, ucse_parcel).id
+        parcel_id = self.api.create_parcel(ucse_parcel, self.profile_id).id
         # Assert
         assert parcel_id
 
     def tearDown(self) -> None:
-        self.session.api.sdwan_feature_profiles.other.delete_profile(self.profile_id)
+        self.api.delete_profile(self.profile_id)
         self.session.close()

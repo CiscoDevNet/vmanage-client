@@ -51,6 +51,7 @@ SUPPORTED_TEMPLATE_TYPES = [
     "dhcp",
     "cisco_dhcp_server",
     "cisco_vpn",
+    "cisco_vpn_interface_gre",
 ]
 
 FEATURE_PROFILE_SYSTEM = [
@@ -87,6 +88,11 @@ FEATURE_PROFILE_OTHER = [
     "ucse",
 ]
 
+FEATURE_PROFILE_SERVICE = [
+    "cisco_vpn",
+    "cisco_vpn_interface_gre",
+]
+
 
 def log_progress(task: str, completed: int, total: int) -> None:
     logger.info(f"{task} {completed}/{total}")
@@ -121,6 +127,17 @@ def transform(ux1: UX1Config) -> UX2Config:
                 description="other",
             ),
         )
+        fp_service_uuid = uuid4()
+        transformed_fp_service = TransformedFeatureProfile(
+            header=TransformHeader(
+                type="service",
+                origin=fp_service_uuid,
+            ),
+            feature_profile=FeatureProfileCreationPayload(
+                name=f"{dt.template_name}_service",
+                description="service",
+            ),
+        )
 
         for template in templates:
             # Those feature templates IDs are real UUIDs and are used to map to the feature profiles
@@ -128,6 +145,8 @@ def transform(ux1: UX1Config) -> UX2Config:
                 transformed_fp_system.header.subelements.add(UUID(template.templateId))
             elif template.templateType in FEATURE_PROFILE_OTHER:
                 transformed_fp_other.header.subelements.add(UUID(template.templateId))
+            elif template.templateType in FEATURE_PROFILE_SERVICE:
+                transformed_fp_service.header.subelements.add(UUID(template.templateId))
 
         transformed_cg = TransformedConfigGroup(
             header=TransformHeader(
@@ -145,6 +164,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         # Add to UX2
         ux2.feature_profiles.append(transformed_fp_system)
         ux2.feature_profiles.append(transformed_fp_other)
+        ux2.feature_profiles.append(transformed_fp_service)
         ux2.config_groups.append(transformed_cg)
 
     for ft in ux1.templates.feature_templates:
