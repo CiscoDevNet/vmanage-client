@@ -3,6 +3,8 @@ from typing import List, Union, get_args
 
 from catalystwan.api.configuration_groups.parcel import Global, as_global
 from catalystwan.models.common import TLOCColor
+from catalystwan.models.configuration.feature_profile.sdwan.service.dhcp_server import SubnetMask
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import Direction
 from catalystwan.models.configuration.feature_profile.sdwan.system.logging_parcel import (
     AuthType,
     CypherSuite,
@@ -11,7 +13,17 @@ from catalystwan.models.configuration.feature_profile.sdwan.system.logging_parce
 )
 from catalystwan.models.configuration.feature_profile.sdwan.system.mrf import EnableMrfMigration, Role
 
-CastableLiterals = [Priority, TlsVersion, AuthType, CypherSuite, Role, EnableMrfMigration, TLOCColor]
+CastableLiterals = [
+    Priority,
+    TlsVersion,
+    AuthType,
+    CypherSuite,
+    Role,
+    EnableMrfMigration,
+    TLOCColor,
+    SubnetMask,
+    Direction,
+]
 
 CastedTypes = Union[
     Global[bool],

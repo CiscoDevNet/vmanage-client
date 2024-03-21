@@ -9,8 +9,7 @@ from catalystwan.utils.timezone import Timezone
 class SystemToBasicTemplateConverter:
     supported_template_types = ("cisco_system", "system-vsmart", "system-vedge")
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> BasicParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> BasicParcel:
         """
         Converts the provided template values into a BasicParcel object.
 

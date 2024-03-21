@@ -4,8 +4,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import NTPPar
 class NTPTemplateConverter:
     supported_template_types = ("cisco_ntp", "ntp")
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> NTPParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> NTPParcel:
         """
         Creates an Logging object based on the provided template values.
 

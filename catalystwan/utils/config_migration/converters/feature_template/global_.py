@@ -4,8 +4,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import Global
 class GlobalTemplateConverter:
     supported_template_types = ("cedge_global",)
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> GlobalParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> GlobalParcel:
         """
         Creates an Logging object based on the provided template values.
 

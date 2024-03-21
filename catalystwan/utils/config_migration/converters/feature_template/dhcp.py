@@ -20,8 +20,7 @@ class DhcpTemplateConverter:
     variable_mac_address = "{{{{dhcp_1_staticLease_{}_macAddress}}}}"
     variable_ip = "{{{{dhcp_1_staticLease_{}_ip}}}}"
 
-    @classmethod
-    def create_parcel(cls, name: str, description: str, template_values: dict) -> LanVpnDhcpServerParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> LanVpnDhcpServerParcel:
         """
         Create a LanVpnDhcpServerParcel object based on the provided parameters.
 
@@ -50,19 +49,19 @@ class DhcpTemplateConverter:
                 "Assiging variable: dhcp_1_addressPool_networkAddress and dhcp_1_addressPool_subnetMask."
             )
             values["address_pool"] = {
-                "network_address": as_variable(cls.variable_address_pool),
-                "subnet_mask": as_variable(cls.variable_subnet_mask),
+                "network_address": as_variable(self.variable_address_pool),
+                "subnet_mask": as_variable(self.variable_subnet_mask),
             }
 
         for entry in values.get("option_code", []):
-            cls._convert_str_list_to_ipv4_list(entry, "ip")
+            self._convert_str_list_to_ipv4_list(entry, "ip")
 
         for key in ("dns_servers", "tftp_servers"):
-            cls._convert_str_list_to_ipv4_list(values, key)
+            self._convert_str_list_to_ipv4_list(values, key)
 
         static_lease = []
         for i, entry in enumerate(values.get("static_lease", [])):
-            mac_address, ip = cls._get_mac_address_and_ip(entry, i)
+            mac_address, ip = self._get_mac_address_and_ip(entry, i)
             static_lease.append(
                 {
                     "mac_address": mac_address,
@@ -79,8 +78,7 @@ class DhcpTemplateConverter:
 
         return LanVpnDhcpServerParcel(**parcel_values)  # type: ignore
 
-    @classmethod
-    def _convert_str_list_to_ipv4_list(cls, d: dict, key: str) -> None:
+    def _convert_str_list_to_ipv4_list(self, d: dict, key: str) -> None:
         """
         Convert a list of strings representing IPv4 addresses to a list of IPv4Address objects.
 
@@ -95,19 +93,18 @@ class DhcpTemplateConverter:
         if str_list := d.get(key, as_global([])).value:
             d[key] = Global[List[IPv4Address]](value=[IPv4Address(ip) for ip in str_list])
 
-    @classmethod
-    def _get_mac_address_and_ip(cls, entry: dict, i: int) -> tuple:
-        mac_address = entry.get("mac_address", as_variable(cls.variable_mac_address.format(i + 1)))
-        ip = entry.get("ip", as_variable(cls.variable_ip.format(i + 1)))
+    def _get_mac_address_and_ip(self, entry: dict, i: int) -> tuple:
+        mac_address = entry.get("mac_address", as_variable(self.variable_mac_address.format(i + 1)))
+        ip = entry.get("ip", as_variable(self.variable_ip.format(i + 1)))
         if isinstance(mac_address, Variable):
             logger.warning(
                 f"No MAC address specified for static lease {i + 1}."
-                f"Assigning variable: {cls.variable_mac_address.format(i + 1)}"
+                f"Assigning variable: {self.variable_mac_address.format(i + 1)}"
             )
         if isinstance(ip, Variable):
             logger.warning(
                 f"No IP address specified for static lease {i + 1}."
-                f"Assigning variable: {cls.variable_ip.format(i + 1)}"
+                f"Assigning variable: {self.variable_ip.format(i + 1)}"
             )
 
         return mac_address, ip

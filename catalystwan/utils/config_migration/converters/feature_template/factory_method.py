@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Dict, cast
+from typing import Any, Callable, Dict, cast
 
 from catalystwan.api.template_api import FeatureTemplateInformation
 from catalystwan.exceptions import CatalystwanException
@@ -53,7 +53,7 @@ supported_parcel_converters: Dict[Any, Any] = {
 }
 
 
-def choose_parcel_converter(template_type: str) -> FeatureTemplateConverter:
+def choose_parcel_converter(template_type: str) -> Callable[..., FeatureTemplateConverter]:
     """
     This function is used to choose the correct parcel factory based on the template type.
 
@@ -87,7 +87,7 @@ def create_parcel_from_template(template: FeatureTemplateInformation) -> AnySyst
     Raises:
         ValueError: If the given template type is not supported.
     """
-    converter = choose_parcel_converter(template.template_type)
+    converter = choose_parcel_converter(template.template_type)()
     template_definition_as_dict = json.loads(cast(str, template.template_definiton))
     template_values = find_template_values(template_definition_as_dict)
     template_values_normalized = template_definition_normalization(template_values)

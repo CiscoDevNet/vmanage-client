@@ -4,6 +4,5 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import AnySys
 
 
 class FeatureTemplateConverter(Protocol):
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> AnySystemParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> AnySystemParcel:
         ...

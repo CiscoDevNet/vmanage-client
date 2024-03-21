@@ -7,13 +7,13 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.appqoe impor
     ServiceNodeGroupName,
     ServiceNodeGroupsNames,
 )
+from catalystwan.utils.config_migration.converters.exceptions import CatalystwanConverterCantConvertException
 
 
 class AppqoeTemplateConverter:
     supported_template_types = ("appqoe",)
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> AppqoeParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> AppqoeParcel:
         """
         Create an AppqoeParcel object based on the provided name, description, and template values.
 
@@ -26,7 +26,21 @@ class AppqoeTemplateConverter:
             AppqoeParcel: The created AppqoeParcel object.
         """
         values = deepcopy(template_values)
-        print(values)
+
+        appnav_controller_group = values.get("appnav_controller_group", [])
+        if not appnav_controller_group:
+            raise CatalystwanConverterCantConvertException("Appnav controller group is required for Appqoe parcel")
+        for appnav in appnav_controller_group:
+            if group_name := appnav.get("group_name"):
+                appnav["group_name"] = as_default(group_name.value, AppnavControllerGroupName)
+            for controller in appnav.get("appnav_controllers", []):
+                if _vpn := controller.get("vpn"):  # noqa: F841
+                    # VPN field is depended on existence of the Service VPN value
+                    # also from UI this list contains only 1 item and should not be a list.
+                    # AppqoeParcel.forwarder.appnav_controller_group.appnav_controllers[0].vpn
+                    # must be populated in the parcel creation process.
+                    pass
+
         for appqoe_item in values.get("service_context", {}).get("appqoe", []):
             if item_name := appqoe_item.get("name"):
                 appqoe_item["name"] = as_default(value=item_name.value)
@@ -46,16 +60,7 @@ class AppqoeTemplateConverter:
             internal = group.get("internal")
             if internal is not None:
                 group["internal"] = as_default(internal.value)
-        for appnav in values.get("appnav_controller_group", []):
-            if group_name := appnav.get("group_name"):
-                appnav["group_name"] = as_default(group_name.value, AppnavControllerGroupName)
-            for controller in appnav.get("appnav_controllers", []):
-                if _vpn := controller.get("vpn"):  # noqa: F841
-                    # VPN field is depended on existence of the Service VPN value
-                    # also from UI this list contains only 1 item and should not be a list.
-                    # AppqoeParcel.forwarder.appnav_controller_group.appnav_controllers[0].vpn
-                    # must be populated in the parcel creation process.
-                    pass
+
         parcel_values = {
             "parcel_name": name,
             "parcel_description": description,

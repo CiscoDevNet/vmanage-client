@@ -8,8 +8,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import AAAPar
 class AAATemplateConverter:
     supported_template_types = ("cisco_aaa", "cedge_aaa", "aaa")
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> AAAParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> AAAParcel:
         """
         Creates an AAAParcel object based on the provided template values.
 

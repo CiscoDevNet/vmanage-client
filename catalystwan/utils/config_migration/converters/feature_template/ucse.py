@@ -12,8 +12,9 @@ class UcseTemplateConverter:
 
     supported_template_types = ("ucse",)
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> UcseParcel:
+    delete_keys = ("module_type", "subslot_name")
+
+    def create_parcel(self, name: str, description: str, template_values: dict) -> UcseParcel:
         """
         Creates a UcseParcel object based on the provided template values.
 
@@ -25,27 +26,34 @@ class UcseTemplateConverter:
         Returns:
             UcseParcel: A UcseParcel object with the provided values.
         """
-        parcel_values = deepcopy(template_values)
+        values = deepcopy(template_values)
+        self.configure_interface(values)
+        self.configure_static_case(values)
+        self.configure_lom_type(values)
+        self.cleanup_keys(values)
+        values.update({"parcel_name": name, "parcel_description": description})
+        return UcseParcel(**values)
 
-        for interface_values in parcel_values.get("interface", []):
+    def configure_interface(self, values: dict) -> None:
+        for interface_values in values.get("interface", []):
             ip = interface_values.pop("ip", None)
             if ip:
                 interface_values["address"] = ip.get("static_case", {}).get("address")
 
-        imc = parcel_values.get("imc", {})
+    def configure_static_case(self, values: dict) -> None:
+        imc = values.get("imc", {})
         static_case = imc.get("ip", {}).get("static_case")
         if static_case:
             imc["ip"] = static_case
 
-        access_port = imc.get("access_port", {})
+    def configure_lom_type(self, values: dict) -> None:
+        access_port = values.get("imc", {}).get("access_port", {})
         shared_lom = access_port.get("shared_lom")
         if shared_lom:
             lom_type = list(shared_lom.keys())[0]
             shared_lom.clear()
             access_port["shared_lom"]["lom_type"] = Global[LomType](value=lom_type)
 
-        for key in ["module_type", "subslot_name"]:
-            parcel_values.pop(key, None)
-
-        parcel_values.update({"parcel_name": name, "parcel_description": description})
-        return UcseParcel(**parcel_values)
+    def cleanup_keys(self, values: dict) -> None:
+        for key in self.delete_keys:
+            values.pop(key, None)

@@ -4,8 +4,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import Banner
 class BannerTemplateConverter:
     supported_template_types = ("cisco_banner",)
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> BannerParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> BannerParcel:
         """
         Creates a BannerParcel object based on the provided template values.
 

@@ -9,8 +9,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system.logging_parce
 class LoggingTemplateConverter:
     supported_template_types = ("cisco_logging", "logging")
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> LoggingParcel:
+    def create_parcel(self, name: str, description: str, template_values: dict) -> LoggingParcel:
         """
         Creates an Logging object based on the provided template values.
 

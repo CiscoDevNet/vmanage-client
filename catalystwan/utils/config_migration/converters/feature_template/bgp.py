@@ -17,8 +17,10 @@ logger = logging.getLogger(__name__)
 class BGPTemplateConverter:
     supported_template_types = ("bgp", "cisco_bgp")
 
-    @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> BGPParcel:
+    device_specific_ipv4_neighbor_address = "{{{{lbgp_1_neighbor_{index}_address}}}}"
+    device_specific_ipv6_neighbor_address = "{{{{lbgp_1_ipv6_neighbor_{index}_address}}}}"
+
+    def create_parcel(self, name: str, description: str, template_values: dict) -> BGPParcel:
         """
         Creates a BannerParcel object based on the provided template values.
 
@@ -30,8 +32,6 @@ class BGPTemplateConverter:
         Returns:
             BannerParcel: A BannerParcel object with the provided template values.
         """
-        device_specific_ipv4_neighbor_address = "{{{{lbgp_1_neighbor_{index}_address}}}}"
-        device_specific_ipv6_neighbor_address = "{{{{lbgp_1_ipv6_neighbor_{index}_address}}}}"
 
         parcel_values = {"parcel_name": name, "parcel_description": description, **deepcopy(template_values["bgp"])}
 
@@ -48,7 +48,7 @@ class BGPTemplateConverter:
                         family_type["family_type"] = as_global(family_type["family_type"].value, FamilyType)
                 if neighbor.get("address") is None:
                     logger.info("Neighbor address is not set, using device specific variable")
-                    neighbor["address"] = as_variable(device_specific_ipv4_neighbor_address.format(index=(i + 1)))
+                    neighbor["address"] = as_variable(self.device_specific_ipv4_neighbor_address.format(index=(i + 1)))
                 if if_name := neighbor.get("update_source", {}).get("if_name"):
                     neighbor["if_name"] = if_name
                     neighbor.pop("update_source")
@@ -73,7 +73,7 @@ class BGPTemplateConverter:
                             )
                 if neighbor.get("address") is None:
                     logger.info("Neighbor address is not set, using device specific variable")
-                    neighbor["address"] = as_variable(device_specific_ipv6_neighbor_address.format(index=(i + 1)))
+                    neighbor["address"] = as_variable(self.device_specific_ipv6_neighbor_address.format(index=(i + 1)))
                 if if_name := neighbor.get("update_source", {}).get("if_name"):
                     neighbor["if_name"] = if_name
                     neighbor.pop("update_source")
