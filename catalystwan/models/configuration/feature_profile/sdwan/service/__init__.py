@@ -8,7 +8,7 @@ from .dhcp_server import LanVpnDhcpServerParcel
 from .lan.ethernet import InterfaceEthernetData
 from .lan.gre import InterfaceGreParcel
 from .lan.ipsec import InterfaceIpsecData
-from .lan.svi import InterfaceSviData
+from .lan.svi import InterfaceSviParcel
 from .lan.vpn import LanVpnParcel
 
 AnyTopLevelServiceParcel = Annotated[
@@ -28,7 +28,7 @@ AnyLanVpnInterfaceParcel = Annotated[
         InterfaceEthernetData,
         InterfaceGreParcel,
         InterfaceIpsecData,
-        InterfaceSviData,
+        InterfaceSviParcel,
     ],
     Field(discriminator="type_"),
 ]

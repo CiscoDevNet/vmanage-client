@@ -1,5 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
+from ipaddress import IPv4Address, IPv6Address, IPv6Interface
 from typing import Literal, Optional, Union
 from uuid import UUID
 
@@ -68,14 +69,14 @@ VrrpTrackerAction = Literal[
 
 
 class Arp(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    ip_address: Union[Variable, Global[str], Default[None]]
+    ip_address: Union[Variable, Global[str], Global[IPv4Address], Default[None]]
     mac_address: Union[Global[str], Variable]
 
 
 class VrrpTrackingObject(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     tracker_id: Union[Default[None], Global[UUID]] = Field(
         serialization_alias="trackerId", validation_alias="trackerId"
@@ -89,18 +90,18 @@ class VrrpTrackingObject(BaseModel):
 
 
 class VrrpIPv6Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    ipv6_link_local: Union[Global[str], Variable] = Field(
+    ipv6_link_local: Union[Global[str], Global[IPv6Address], Variable] = Field(
         serialization_alias="ipv6LinkLocal", validation_alias="ipv6LinkLocal"
     )
-    prefix: Optional[Union[Global[str], Variable, Default[None]]] = None
+    prefix: Optional[Union[Global[str], Global[IPv6Interface], Variable, Default[None]]] = None
 
 
 class StaticIPv4Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    ip_address: Union[Variable, Global[str], Default[None]] = Field(
+    ip_address: Union[Variable, Global[str], Global[IPv4Address], Default[None]] = Field(
         serialization_alias="ipAddress", validation_alias="ipAddress"
     )
     subnet_mask: Union[Variable, Global[str], Default[None]] = Field(
@@ -109,6 +110,6 @@ class StaticIPv4Address(BaseModel):
 
 
 class StaticIPv6Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    address: Union[Global[str], Variable]
+    address: Union[Global[str], Global[IPv6Interface], Variable]

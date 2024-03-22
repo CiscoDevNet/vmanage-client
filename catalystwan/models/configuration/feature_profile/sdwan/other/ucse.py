@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv4Interface
 from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
@@ -35,7 +35,7 @@ class Ip(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    address: Union[Global[str], Variable] = Field(
+    address: Union[Global[str], Global[IPv4Interface], Variable] = Field(
         default=as_variable("{{ipv4Addr}}"), description="Assign IPv4 address"
     )
     default_gateway: Union[Global[IPv4Address], Variable, Default[None]] = Field(
@@ -88,7 +88,9 @@ class InterfaceItem(BaseModel):
         validation_alias="ucseInterfaceVpn",
         description="UCSE Interface VPN",
     )
-    address: Optional[Union[Global[str], Variable]] = Field(default=None, description="Assign IPv4 address")
+    address: Optional[Union[Global[str], Global[IPv4Interface], Variable]] = Field(
+        default=None, description="Assign IPv4 address"
+    )
 
 
 class UcseParcel(_ParcelBase):

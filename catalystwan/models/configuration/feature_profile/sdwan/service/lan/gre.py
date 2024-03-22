@@ -1,6 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address, IPv6Address
+from ipaddress import IPv4Address, IPv6Address, IPv6Interface
 from typing import Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
@@ -97,7 +97,7 @@ class BasicGre(BaseModel):
     )
     description: Union[Global[str], Variable, Default[None]] = Field(default=Default[None](value=None))
     address: Optional[GreAddress] = None
-    ipv6_address: Optional[Union[Global[str], Global[IPv6Address], Variable, Default[None]]] = Field(
+    ipv6_address: Optional[Union[Global[str], Global[IPv6Interface], Variable, Default[None]]] = Field(
         serialization_alias="ipv6Address", validation_alias="ipv6Address", default=None
     )
     shutdown: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)

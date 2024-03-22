@@ -1,9 +1,10 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
+from ipaddress import IPv4Address, IPv6Interface
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common import (
@@ -16,19 +17,19 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common i
 
 
 class VrrpIPv4SecondaryAddress(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: Union[Variable, Global[str]]
 
 
 class VrrpIPv6SecondaryAddress(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    prefix: Union[Global[str], Variable]
+    prefix: Union[Global[str], Global[IPv6Interface], Variable]
 
 
 class VrrpIPv4(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     group_id: Union[Variable, Global[int]] = Field(serialization_alias="groupId", validation_alias="groupId")
     priority: Union[Variable, Global[int], Default[int]] = Default[int](value=100)
@@ -36,7 +37,9 @@ class VrrpIPv4(BaseModel):
     track_omp: Union[Global[bool], Default[bool]] = Field(
         serialization_alias="trackOmp", validation_alias="trackOmp", default=Default[bool](value=False)
     )
-    ip_address: Union[Global[str], Variable] = Field(serialization_alias="ipAddress", validation_alias="ipAddress")
+    ip_address: Union[Global[str], Global[IPv4Address], Variable] = Field(
+        serialization_alias="ipAddress", validation_alias="ipAddress"
+    )
     ip_address_secondary: Optional[List[VrrpIPv4SecondaryAddress]] = Field(
         serialization_alias="ipAddressSecondary", validation_alias="ipAddressSecondary"
     )
@@ -54,7 +57,7 @@ class VrrpIPv4(BaseModel):
 
 
 class VrrpIPv6(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     group_id: Union[Variable, Global[int]] = Field(serialization_alias="groupId", validation_alias="groupId")
     priority: Union[Variable, Global[int], Default[int]] = Default[int](value=100)
@@ -70,14 +73,14 @@ class VrrpIPv6(BaseModel):
 
 
 class Dhcpv6Helper(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: Union[Global[str], Variable] = Field(serialization_alias="address", validation_alias="address")
     vpn: Optional[Union[Global[int], Variable, Default[None]]] = None
 
 
 class AdvancedSviAttributes(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     tcp_mss: Optional[Union[Global[int], Variable, Default[None]]] = Field(
         serialization_alias="tcpMss", validation_alias="tcpMss", default=Default[None](value=None)
@@ -97,8 +100,8 @@ class AdvancedSviAttributes(BaseModel):
     )
 
 
-class IPv4Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class IPv4AddressConfiguration(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: StaticIPv4Address = Field(serialization_alias="addressV4", validation_alias="addressV4")
     secondary_address: Optional[List[StaticIPv4Address]] = Field(
@@ -109,10 +112,10 @@ class IPv4Address(BaseModel):
     )
 
 
-class IPv6Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class IPv6AddressConfiguration(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    address: Union[Global[str], Variable, Default[None]] = Field(
+    address: Union[Global[str], Global[IPv6Interface], Variable, Default[None]] = Field(
         serialization_alias="addressV6", validation_alias="addressV6"
     )
     secondary_address: Optional[List[StaticIPv6Address]] = Field(
@@ -124,7 +127,7 @@ class IPv6Address(BaseModel):
 
 
 class AclQos(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     ipv4_acl_egress: Optional[Global[UUID]] = Field(
         serialization_alias="ipv4AclEgress", validation_alias="ipv4AclEgress", default=None
@@ -140,30 +143,32 @@ class AclQos(BaseModel):
     )
 
 
-class InterfaceSviData(_ParcelBase):
+class InterfaceSviParcel(_ParcelBase):
     type_: Literal["svi"] = Field(default="svi", exclude=True)
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    shutdown: Union[Global[bool], Variable, Default[bool]] = Default[bool](value=True)
-    interface_name: Optional[Union[Global[str], Variable]] = Field(
-        serialization_alias="interfaceName", validation_alias="interfaceName"
+    shutdown: Union[Global[bool], Variable, Default[bool]] = Field(
+        default=Default[bool](value=True), validation_alias=AliasPath("data", "shutdown")
     )
-    description: Optional[Union[Global[str], Variable, Default[None]]] = Default[None](value=None)
+    interface_name: Union[Global[str], Variable] = Field(validation_alias=AliasPath("data", "interfaceName"))
+    svi_description: Optional[Union[Global[str], Variable, Default[None]]] = Field(
+        default=Default[bool](value=True), validation_alias=AliasPath("data", "description")
+    )
     interface_mtu: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="ifMtu", validation_alias="ifMtu", default=Default[int](value=1500)
+        validation_alias=AliasPath("data", "ifMtu"), default=Default[int](value=1500)
     )
     ip_mtu: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="ipMtu", validation_alias="ipMtu", default=Default[int](value=1500)
+        validation_alias=AliasPath("data", "ipMtu"), default=Default[int](value=1500)
     )
-    ipv4: Optional[IPv4Address] = None
-    ipv6: Optional[IPv6Address] = None
-    acl_qos: Optional[AclQos] = Field(serialization_alias="aclQos", validation_alias="aclQos", default=None)
-    arp: Optional[List[Arp]] = None
-    vrrp: Optional[List[VrrpIPv4]] = None
-    vrrp_ipv6: Optional[List[VrrpIPv6]] = Field(
-        serialization_alias="vrrpIpv6", validation_alias="vrrpIpv6", default=None
-    )
+    ipv4: Optional[IPv4AddressConfiguration] = Field(default=None, validation_alias=AliasPath("data", "ipv4"))
+    ipv6: Optional[IPv6AddressConfiguration] = Field(default=None, validation_alias=AliasPath("data", "ipv6"))
+    acl_qos: Optional[AclQos] = Field(validation_alias=AliasPath("data", "aclQos"), default=None)
+    arp: Optional[List[Arp]] = Field(default=None, validation_alias=AliasPath("data", "arp"))
+    vrrp: Optional[List[VrrpIPv4]] = Field(default=None, validation_alias=AliasPath("data", "vrrp"))
+    vrrp_ipv6: Optional[List[VrrpIPv6]] = Field(validation_alias=AliasPath("data", "vrrpIpv6"), default=None)
     dhcp_client_v6: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
-        serialization_alias="dhcpClientV6", validation_alias="dhcpClientV6", default=Default[bool](value=False)
+        validation_alias=AliasPath("data", "dhcpClientV6"), default=Default[bool](value=False)
     )
-    advanced: AdvancedSviAttributes = AdvancedSviAttributes()
+    advanced: AdvancedSviAttributes = Field(
+        default_factory=AdvancedSviAttributes, validation_alias=AliasPath("data", "advanced")
+    )

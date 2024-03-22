@@ -1,4 +1,4 @@
-from ipaddress import AddressValueError, IPv4Address, IPv6Address
+from ipaddress import AddressValueError, IPv4Address, IPv4Interface, IPv6Address, IPv6Interface
 from typing import List, Union, get_args
 
 from catalystwan.api.configuration_groups.parcel import Global, as_global
@@ -10,6 +10,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common i
     IpsecCiphersuite,
     PfsGroup,
     TunnelApplication,
+    VrrpTrackerAction,
 )
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import GreTunnelMode
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import Direction
@@ -37,6 +38,7 @@ CastableLiterals = [
     PfsGroup,
     TunnelApplication,
     GreTunnelMode,
+    VrrpTrackerAction,
 ]
 
 CastedTypes = Union[
@@ -47,6 +49,8 @@ CastedTypes = Union[
     Global[List[int]],
     Global[IPv4Address],
     Global[IPv6Address],
+    Global[IPv4Interface],
+    Global[IPv6Interface],
 ]
 
 
@@ -74,6 +78,16 @@ def cast_value_to_global(value: Union[str, int, List[str], List[int]]) -> Casted
         try:
             ipv6_address = IPv6Address(value)
             return Global[IPv6Address](value=ipv6_address)
+        except AddressValueError:
+            pass
+        try:
+            ipv4_interface = IPv4Interface(value)
+            return Global[IPv4Interface](value=ipv4_interface)
+        except AddressValueError:
+            pass
+        try:
+            ipv6_interface = IPv6Interface(value)
+            return Global[IPv6Interface](value=ipv6_interface)
         except AddressValueError:
             pass
         for literal in CastableLiterals:

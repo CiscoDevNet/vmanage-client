@@ -1,7 +1,7 @@
 import unittest
 from ipaddress import IPv4Address
 from unittest.mock import Mock
-from uuid import UUID
+from uuid import uuid4
 
 from parameterized import parameterized  # type: ignore
 
@@ -11,6 +11,7 @@ from catalystwan.endpoints.configuration.feature_profile.sdwan.service import Se
 from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
 from catalystwan.models.configuration.feature_profile.sdwan.service import LanVpnDhcpServerParcel, LanVpnParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import BasicGre, InterfaceGreParcel
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviParcel
 from catalystwan.models.configuration.feature_profile.sdwan.system import (
     AAAParcel,
     BannerParcel,
@@ -42,8 +43,8 @@ system_endpoint_mapping = {
 
 class TestSystemFeatureProfileAPI(unittest.TestCase):
     def setUp(self):
-        self.profile_uuid = UUID("054d1b82-9fa7-43c6-98fb-4355da0d77ff")
-        self.parcel_uuid = UUID("7113505f-8cec-4420-8799-1a209357ba7e")
+        self.profile_uuid = uuid4()
+        self.parcel_uuid = uuid4()
         self.mock_session = Mock()
         self.mock_endpoint = Mock(spec=SystemFeatureProfile)
         self.api = SystemFeatureProfileAPI(self.mock_session)
@@ -103,15 +104,24 @@ service_interface_parcels = [
             parcel_description="Test Gre Parcel",
             basic=BasicGre(if_name=as_global("gre1"), tunnel_destination=as_global(IPv4Address("4.4.4.4"))),
         ),
-    )
+    ),
+    (
+        "svi",
+        InterfaceSviParcel(
+            parcel_name="TestSviParcel",
+            parcel_description="Test Svi Parcel",
+            interface_name=as_global("Vlan1"),
+            svi_description=as_global("Test Svi Description"),
+        ),
+    ),
 ]
 
 
 class TestServiceFeatureProfileAPI(unittest.TestCase):
     def setUp(self):
-        self.profile_uuid = UUID("054d1b82-9fa7-43c6-98fb-4355da0d77ff")
-        self.vpn_uuid = UUID("054d1b82-9fa7-43c6-98fb-4355da0d77ff")
-        self.parcel_uuid = UUID("7113505f-8cec-4420-8799-1a209357ba7e")
+        self.profile_uuid = uuid4()
+        self.vpn_uuid = uuid4()
+        self.parcel_uuid = uuid4()
         self.mock_session = Mock()
         self.mock_endpoint = Mock(spec=ServiceFeatureProfile)
         self.api = ServiceFeatureProfileAPI(self.mock_session)

@@ -23,6 +23,7 @@ from .normalizer import template_definition_normalization
 from .ntp import NTPTemplateConverter
 from .omp import OMPTemplateConverter
 from .security import SecurityTemplateConverter
+from .svi import InterfaceSviTemplateConverter
 from .thousandeyes import ThousandEyesTemplateConverter
 from .ucse import UcseTemplateConverter
 from .vpn import LanVpnParcelTemplateConverter
@@ -47,6 +48,7 @@ available_converters = [
     AppqoeTemplateConverter,
     LanVpnParcelTemplateConverter,
     InterfaceGRETemplateConverter,
+    InterfaceSviTemplateConverter,
 ]
 
 
