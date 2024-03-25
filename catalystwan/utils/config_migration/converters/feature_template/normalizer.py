@@ -12,6 +12,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common i
     TunnelApplication,
     VrrpTrackerAction,
 )
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ethernet import DuplexMode, MediaType, NatType
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import GreTunnelMode
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import Direction
 from catalystwan.models.configuration.feature_profile.sdwan.system.logging_parcel import (
@@ -39,6 +40,9 @@ CastableLiterals = [
     TunnelApplication,
     GreTunnelMode,
     VrrpTrackerAction,
+    DuplexMode,
+    MediaType,
+    NatType,
 ]
 
 CastedTypes = Union[

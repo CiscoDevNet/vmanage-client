@@ -7,6 +7,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.dhcp_server 
     LanVpnDhcpServerParcel,
     SubnetMask,
 )
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import BasicGre, InterfaceGreParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnParcel
@@ -84,6 +85,19 @@ class TestServiceFeatureProfileVPNInterfaceModels(TestFeatureProfileModels):
         )
         # Act
         parcel_id = self.api.create_parcel(self.profile_uuid, svi_parcel, self.vpn_parcel_uuid).id
+        # Assert
+        assert parcel_id
+
+    def test_when_default_values_ethernet_parcel_expect_successful_post(self):
+        # Arrange
+        ethernet_parcel = InterfaceEthernetParcel(
+            parcel_name="TestEthernetParcel",
+            parcel_description="Test Ethernet Parcel",
+            if_name=as_global("HundredGigE"),
+            ethernet_description=as_global("Test Ethernet Description"),
+        )
+        # Act
+        parcel_id = self.api.create_parcel(self.profile_uuid, ethernet_parcel, self.vpn_parcel_uuid).id
         # Assert
         assert parcel_id
 

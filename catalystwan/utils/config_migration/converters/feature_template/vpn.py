@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from catalystwan.api.configuration_groups.parcel import as_default, as_global, as_variable
 from catalystwan.models.configuration.feature_profile.common import Prefix
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import (
+    DHCP,
     Direction,
     DnsIPv4,
     HostMapping,
@@ -71,7 +72,7 @@ class LanVpnParcelTemplateConverter:
     A class for converting template values into a LanVpnParcel object.
     """
 
-    supported_template_types = ("cisco_vpn",)
+    supported_template_types = ("cisco_vpn", "vpn-vedge", "vpn-vsmart")
 
     delete_keys = (
         "ecmp_hash_key",
@@ -86,6 +87,7 @@ class LanVpnParcelTemplateConverter:
         "route_import_from",
         "route_import",
         "route_export",
+        "tcp_optimization",
     )
 
     route_leaks_mapping = {
@@ -163,7 +165,9 @@ class LanVpnParcelTemplateConverter:
             LanVpnParcel: The created LanVpnParcel object.
         """
         values = deepcopy(template_values)
+        print(values)
         self.configure_vpn_name(values)
+        self.configure_vpn_id(values)
         self.configure_natpool(values)
         self.configure_port_forwarding(values)
         self.configure_static_nat(values)
@@ -177,12 +181,14 @@ class LanVpnParcelTemplateConverter:
         self.configure_routes(values)
         self.configure_route_leaks(values)
         self.cleanup_keys(values)
-        parcel_values = {
+        return LanVpnParcel(**self.prepare_parcel_values(name, description, values))  # type: ignore
+
+    def prepare_parcel_values(self, name: str, description: str, values: dict) -> dict:
+        return {
             "parcel_name": name,
             "parcel_description": description,
             **values,
         }
-        return LanVpnParcel(**parcel_values)  # type: ignore
 
     def cleanup_keys(self, values: dict) -> None:
         for key in self.delete_keys:
@@ -191,6 +197,11 @@ class LanVpnParcelTemplateConverter:
     def configure_vpn_name(self, values: dict) -> None:
         if vpn_name := values.get("name", None):
             values["vpn_name"] = vpn_name
+
+    def configure_vpn_id(self, values: dict) -> None:
+        if vpn_id := values.get("vpn_id"):
+            if isinstance(vpn_id.value, str):
+                values["vpn_id"] = as_global(int(vpn_id.value))
 
     def configure_dns(self, values: dict) -> None:
         if dns := values.get("dns", []):
@@ -389,6 +400,15 @@ class LanVpnParcelTemplateConverter:
                         next_hop_container=NextHopContainer(next_hop_with_tracker=next_hop_items)  # type: ignore
                     )
                 elif "vpn" in route:
+                    ip_route_item = StaticRouteVPN(  # type: ignore
+                        vpn=as_global(True),
+                    )
+                elif "dhcp" in route:
+                    ip_route_item = DHCP(  # type: ignore
+                        dhcp=as_global(True),
+                    )
+                else:
+                    # Let's assume it's a static route with enabled VPN
                     ip_route_item = StaticRouteVPN(  # type: ignore
                         vpn=as_global(True),
                     )

@@ -102,10 +102,10 @@ class StaticIPv4Address(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     ip_address: Union[Variable, Global[str], Global[IPv4Address], Default[None]] = Field(
-        serialization_alias="ipAddress", validation_alias="ipAddress"
+        serialization_alias="ipAddress", validation_alias="ipAddress", default=Default[None](value=None)
     )
     subnet_mask: Union[Variable, Global[str], Default[None]] = Field(
-        serialization_alias="subnetMask", validation_alias="subnetMask"
+        serialization_alias="subnetMask", validation_alias="subnetMask", default=Default[None](value=None)
     )
 
 

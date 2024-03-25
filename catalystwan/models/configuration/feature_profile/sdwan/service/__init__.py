@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 
 from .appqoe import AppqoeParcel
 from .dhcp_server import LanVpnDhcpServerParcel
-from .lan.ethernet import InterfaceEthernetData
+from .lan.ethernet import InterfaceEthernetParcel
 from .lan.gre import InterfaceGreParcel
 from .lan.ipsec import InterfaceIpsecData
 from .lan.svi import InterfaceSviParcel
@@ -25,7 +25,7 @@ AnyTopLevelServiceParcel = Annotated[
 
 AnyLanVpnInterfaceParcel = Annotated[
     Union[
-        InterfaceEthernetData,
+        InterfaceEthernetParcel,
         InterfaceGreParcel,
         InterfaceIpsecData,
         InterfaceSviParcel,
@@ -42,6 +42,8 @@ __all__ = [
     "LanVpnDhcpServerParcel",
     "AppqoeParcel",
     "LanVpnParcel",
+    "InterfaceSviParcel",
+    "InterfaceGreParcel",
     "AnyServiceParcel",
     "AnyTopLevelServiceParcel",
     "AnyLanVpnInterfaceParcel",
