@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated, Callable, Mapping, Union
+from typing import TYPE_CHECKING, Callable, Mapping, Union
 
 from pydantic import Field
+from typing_extensions import Annotated
 
 from catalystwan.api.builders.feature_profiles.service import ServiceFeatureProfileBuilder
 from catalystwan.exceptions import CatalystwanException
