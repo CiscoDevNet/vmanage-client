@@ -27,7 +27,8 @@ class InterfaceIpsecTemplateConverter:
         self.configure_dead_peer_detection(values)
         self.configure_ike(values)
         self.configure_ipsec(values)
-        self.configure_tunnel(values)
+        self.configure_tunnel_destination(values)
+        self.configure_tunnel_source(values)
         self.configure_ipv6_address(values)
         self.configure_address(values)
         self.configure_tracker(values)
@@ -62,12 +63,11 @@ class InterfaceIpsecTemplateConverter:
                 ike["ike_group"] = as_global(ike_group.value, IkeGroup)
             ike.update(ike.get("authentication_type", {}).get("pre_shared_key", {}))
         values.update(ike)
-        print(values)
 
     def configure_ipsec(self, values: dict) -> None:
         values.update(values.get("ipsec", {}))
 
-    def configure_tunnel(self, values: dict) -> None:
+    def configure_tunnel_destination(self, values: dict) -> None:
         if tunnel_destination := values.get("tunnel_destination"):
             if isinstance(tunnel_destination.value, IPv4Interface):
                 values["tunnel_destination"] = IpsecAddress(
@@ -77,6 +77,13 @@ class InterfaceIpsecTemplateConverter:
             elif isinstance(tunnel_destination.value, IPv6Address):
                 values.pop("tunnel_destination")
                 values["tunnel_destination_v6"] = tunnel_destination
+
+    def configure_tunnel_source(self, values: dict) -> None:
+        if tunnel_source := values.get("tunnel_source"):
+            values["tunnel_source"] = IpsecAddress(
+                address=as_global(str(tunnel_source.value)),
+                mask=as_global("0.0.0.0"),
+            )
 
     def configure_tracker(self, values: dict) -> None:
         tracker = values.get("tracker")

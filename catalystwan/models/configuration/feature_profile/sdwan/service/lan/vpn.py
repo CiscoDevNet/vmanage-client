@@ -443,7 +443,7 @@ class StaticNat(BaseModel):
         serialization_alias="sourceIp", validation_alias="sourceIp"
     )
     translated_source_ip: Union[Variable, Global[str], Global[IPv4Address]] = Field(
-        serialization_alias="TranslatedSourceIP", validation_alias="TranslatedSourceIP"
+        serialization_alias="TranslatedSourceIp", validation_alias="TranslatedSourceIp"
     )
     static_nat_direction: Union[Variable, Global[Direction]] = Field(
         serialization_alias="staticNatDirection", validation_alias="staticNatDirection"
@@ -599,14 +599,14 @@ class LanVpnParcel(_ParcelBase):
         validation_alias=AliasPath("data", "newHostMapping"), default=None
     )
     omp_advertise_ipv4: Optional[List[OmpAdvertiseIPv4]] = Field(
-        validation_alias=AliasPath("data", "ompAdvertiseIpv4"), default=None
+        validation_alias=AliasPath("data", "ompAdvertiseIp4"), default=None  # API typo
     )
     omp_advertise_ipv6: Optional[List[OmpAdvertiseIPv6]] = Field(
         validation_alias=AliasPath("data", "ompAdvertiseIpv6"), default=None
     )
     ipv4_route: Optional[List[StaticRouteIPv4]] = Field(validation_alias=AliasPath("data", "ipv4Route"), default=None)
     ipv6_route: Optional[List[StaticRouteIPv6]] = Field(validation_alias=AliasPath("data", "ipv6Route"), default=None)
-    service: Optional[List[Service]] = None
+    service: Optional[List[Service]] = Field(default=None, validation_alias=AliasPath("data", "service"))
     service_route: Optional[List[ServiceRoute]] = Field(
         validation_alias=AliasPath("data", "serviceRoute"), default=None
     )

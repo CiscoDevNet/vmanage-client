@@ -165,9 +165,8 @@ class LanVpnParcelTemplateConverter:
             LanVpnParcel: The created LanVpnParcel object.
         """
         values = deepcopy(template_values)
-        print(values)
         self.configure_vpn_name(values)
-        self.configure_vpn_id(values)
+        self.configure_vpn_id(name, values)
         self.configure_natpool(values)
         self.configure_port_forwarding(values)
         self.configure_static_nat(values)
@@ -198,10 +197,19 @@ class LanVpnParcelTemplateConverter:
         if vpn_name := values.get("name", None):
             values["vpn_name"] = vpn_name
 
-    def configure_vpn_id(self, values: dict) -> None:
+    def configure_vpn_id(self, name: str, values: dict) -> None:
         if vpn_id := values.get("vpn_id"):
-            if isinstance(vpn_id.value, str):
-                values["vpn_id"] = as_global(int(vpn_id.value))
+            vpn_id_value = int(vpn_id.value)
+            # VPN 0 contains all of a device's interfaces except for the management interface,
+            # and all interfaces are disabled.
+            # VPN 512 is RESERVED for OOB network management
+            if vpn_id_value in (0, 512):
+                logger.warning(
+                    f"VPN ID {vpn_id_value} is reserved for system use. " f"VPN ID will be set to 1 for VPN {name}."
+                )
+                values["vpn_id"] = as_global(1)
+            else:
+                values["vpn_id"] = as_global(vpn_id_value)
 
     def configure_dns(self, values: dict) -> None:
         if dns := values.get("dns", []):
@@ -231,7 +239,7 @@ class LanVpnParcelTemplateConverter:
                 service_item = Service(
                     service_type=as_global(entry["svc_type"].value, ServiceType),
                     ipv4_addresses=entry.get("address", as_variable(self.service_ipv4_addresses.format(service_i + 1))),
-                    tracking=entry.get("track_enable", as_default(False)),
+                    tracking=entry.get("track_enable", as_default(True)),
                 )
                 service_items.append(service_item)
             values["service"] = service_items

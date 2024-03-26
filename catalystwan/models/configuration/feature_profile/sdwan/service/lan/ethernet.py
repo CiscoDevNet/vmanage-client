@@ -19,7 +19,6 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn impo
 NatType = Literal[
     "pool",
     "loopback",
-    "interface",
 ]
 
 DuplexMode = Literal[
@@ -38,7 +37,9 @@ MediaType = Literal[
 class DynamicDhcpDistance(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    dynamic_dhcp_distance: Union[Variable, Global[int], Default[int]] = Default[int](value=1)
+    dynamic_dhcp_distance: Union[Variable, Global[int], Default[int]] = Field(
+        default=Default[int](value=1), serialization_alias="dynamicDhcpDistance", validation_alias="dynamicDhcpDistance"
+    )
 
 
 class InterfaceDynamicIPv4Address(BaseModel):
@@ -157,7 +158,7 @@ class NatAttributesIPv4(BaseModel):
         serialization_alias="udpTimeout", validation_alias="udpTimeout", default=Default[int](value=1)
     )
     tcp_timeout: Union[Global[int], Variable, Default[int]] = Field(
-        serialization_alias="tcpTimeout", validation_alias="tcpTimeout", default=Default[int](value=1)
+        serialization_alias="tcpTimeout", validation_alias="tcpTimeout", default=Default[int](value=60)
     )
     new_static_nat: Optional[List[StaticNat]] = Field(
         serialization_alias="newStaticNat", validation_alias="newStaticNat", default=None

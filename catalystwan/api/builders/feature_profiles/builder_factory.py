@@ -5,7 +5,9 @@ from typing import TYPE_CHECKING, Callable, Mapping, Union
 from pydantic import Field
 from typing_extensions import Annotated
 
+from catalystwan.api.builders.feature_profiles.other import OtherFeatureProfileBuilder
 from catalystwan.api.builders.feature_profiles.service import ServiceFeatureProfileBuilder
+from catalystwan.api.builders.feature_profiles.system import SystemFeatureProfileBuilder
 from catalystwan.exceptions import CatalystwanException
 from catalystwan.models.configuration.feature_profile.common import ProfileType
 
@@ -14,8 +16,10 @@ if TYPE_CHECKING:
 
 FeatureProfileBuilder = Annotated[Union[ServiceFeatureProfileBuilder], Field(discriminator="type")]
 
-BUILDER_MAPPING: Mapping[ProfileType, Callable[[ManagerSession], FeatureProfileBuilder]] = {
+BUILDER_MAPPING: Mapping[ProfileType, Callable] = {
     "service": ServiceFeatureProfileBuilder,
+    "system": SystemFeatureProfileBuilder,
+    "other": OtherFeatureProfileBuilder,
 }
 
 

@@ -12,7 +12,9 @@ from catalystwan.endpoints.configuration.feature_profile.sdwan.service import Se
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
 from catalystwan.models.configuration.feature_profile.sdwan.service import (
     AppqoeParcel,
+    InterfaceEthernetParcel,
     InterfaceGreParcel,
+    InterfaceIpsecParcel,
     InterfaceSviParcel,
     LanVpnDhcpServerParcel,
     LanVpnParcel,
@@ -22,7 +24,10 @@ if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
 
 IndependedParcels = Annotated[Union[AppqoeParcel, LanVpnDhcpServerParcel], Field(discriminator="type_")]
-DependedInterfaceParcels = Annotated[Union[InterfaceGreParcel, InterfaceSviParcel], Field(discriminator="type_")]
+DependedInterfaceParcels = Annotated[
+    Union[InterfaceGreParcel, InterfaceSviParcel, InterfaceEthernetParcel, InterfaceIpsecParcel],
+    Field(discriminator="type_"),
+]
 
 
 class ServiceFeatureProfileBuilder:
@@ -105,7 +110,7 @@ class ServiceFeatureProfileBuilder:
         Returns:
             Service feature profile UUID
         """
-        profile_uuid = self._endpoints.create_sdwan_service_feature_profile(self._profile).profile_id
+        profile_uuid = self._endpoints.create_sdwan_service_feature_profile(self._profile).id
 
         for parcel in self._independent_items:
             self._api.create_parcel(profile_uuid, parcel)

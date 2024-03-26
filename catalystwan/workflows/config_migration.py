@@ -238,10 +238,10 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
 
     """Collect Templates"""
     template_api = session.api.templates
-    progress("Collecting Templates Info", 0, 2)
 
+    progress("Collecting Feature Templates", 0, 1)
     ux1.templates.feature_templates = [t for t in template_api.get_feature_templates()]
-    progress("Collecting Feature Templates", 1, 2)
+    progress("Collecting Feature Templates", 1, 1)
 
     device_templates_information = template_api.get_device_templates()
     for i, device_template_information in enumerate(device_templates_information):

@@ -1,21 +1,17 @@
-from typing import Callable, Dict, List, cast
+import logging
+from typing import Dict, List, Tuple, cast
 from uuid import UUID
-from venv import logger
 
 from pydantic import BaseModel
 
 from catalystwan.endpoints.configuration_group import ProfileId
-from catalystwan.exceptions import CatalystwanException
-from catalystwan.models.configuration.config_migration import (
-    TransformedFeatureProfile,
-    TransformedParcel,
-    UX2Config,
-    UX2ConfigRollback,
-)
+from catalystwan.exceptions import ManagerHTTPError
+from catalystwan.models.configuration.config_migration import TransformedFeatureProfile, TransformedParcel, UX2Config
 from catalystwan.models.configuration.feature_profile.common import ProfileType
 from catalystwan.session import ManagerSession
-from catalystwan.utils.config_migration.factories.feature_profile_api import FeatureProfileAPIFactory
 from catalystwan.utils.config_migration.factories.parcel_pusher import ParcelPusherFactory
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigurationMapping(BaseModel):
@@ -42,8 +38,9 @@ class UX2ConfigPusher:
     def push(self) -> UX2ConfigRollback:
         try:
             self._create_config_groups()
-        except CatalystwanException as e:
-            logger.error(f"Error occured during config push: {e}")
+        except ManagerHTTPError as e:
+            logger.error(f"Error occured during config push: {e.info}")
+        logger.debug(f"Configuration push completed successfully. Rollback configuration {self._config_rollback}")
         return self._config_rollback
 
     def _create_config_groups(self):
@@ -63,18 +60,19 @@ class UX2ConfigPusher:
         for feature_profile_id in feature_profiles_ids:
             transformed_feature_profile = self._config_map.feature_profile_map[feature_profile_id]
             profile_type = cast(ProfileType, transformed_feature_profile.header.type)
-            api = FeatureProfileAPIFactory.get_api(profile_type, self._session)
-            name = transformed_feature_profile.feature_profile.name
-            description = transformed_feature_profile.feature_profile.description
             if profile_type == "policy-object":
-                # TODO: Get default policy profile
+                logger.debug(f"Skipping policy-object profile: {transformed_feature_profile.feature_profile.name}")
                 continue
-            created_profile_id = api.create_profile(name, description).id  # type: ignore
+            logger.debug(
+                f"Creating feature profile: {transformed_feature_profile.feature_profile.name} "
+                f"with origin uuid: {transformed_feature_profile.header.origin} "
+                f"and parcels: {transformed_feature_profile.header.subelements}"
+            )
+            pusher = ParcelPusherFactory.get_pusher(self._session, profile_type)
+            parcels = [
+                self._config_map.parcel_map[element] for element in transformed_feature_profile.header.subelements
+            ]
+            created_profile_id = pusher.push(transformed_feature_profile.feature_profile, parcels)
             config_group_profiles.append(ProfileId(id=created_profile_id))
-            self._create_parcels(api, created_profile_id, profile_type, transformed_feature_profile.header.subelements)
             self._config_rollback.add_feature_profile(created_profile_id, profile_type)
         return config_group_profiles
-
-    def _create_parcels(self, api, profile_uuid, profile_type, parcels_uuids):
-        pusher = ParcelPusherFactory.get_pusher(profile_type, api)
-        pusher.push(profile_uuid, parcels_uuids, self._config_map.parcel_map)
