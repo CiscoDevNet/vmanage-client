@@ -19,6 +19,7 @@ from .bfd import BFDTemplateConverter
 from .bgp import BGPTemplateConverter
 from .global_ import GlobalTemplateConverter
 from .gre import InterfaceGRETemplateConverter
+from .ipsec import InterfaceIpsecTemplateConverter
 from .logging_ import LoggingTemplateConverter
 from .normalizer import template_definition_normalization
 from .ntp import NTPTemplateConverter
@@ -51,6 +52,7 @@ available_converters = [
     InterfaceGRETemplateConverter,
     InterfaceSviTemplateConverter,
     InterfaceEthernetTemplateConverter,
+    InterfaceIpsecTemplateConverter,
 ]
 
 

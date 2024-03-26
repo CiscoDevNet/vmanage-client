@@ -52,6 +52,12 @@ SUPPORTED_TEMPLATE_TYPES = [
     "cisco_dhcp_server",
     "cisco_vpn",
     "cisco_vpn_interface_gre",
+    "vpn-vsmart-interface",
+    "vpn-vedge-interface",
+    "vpn-vmanage-interface",
+    "cisco_vpn_interface",
+    "cisco_vpn_interface_ipsec",
+    "vpn-interface-svi",
 ]
 
 FEATURE_PROFILE_SYSTEM = [
@@ -95,6 +101,8 @@ FEATURE_PROFILE_SERVICE = [
     "vpn-vedge-interface",
     "vpn-vmanage-interface",
     "cisco_vpn_interface",
+    "cisco_vpn_interface_ipsec",
+    "vpn-interface-svi",
 ]
 
 

@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from parameterized import parameterized  # type: ignore
 
-from catalystwan.api.configuration_groups.parcel import as_global
+from catalystwan.api.configuration_groups.parcel import Global, as_global, as_variable
 from catalystwan.api.feature_profile_api import ServiceFeatureProfileAPI, SystemFeatureProfileAPI
 from catalystwan.endpoints.configuration.feature_profile.sdwan.service import ServiceFeatureProfile
 from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
@@ -13,6 +13,11 @@ from catalystwan.models.configuration.feature_profile.sdwan.service import LanVp
 from catalystwan.models.configuration.feature_profile.sdwan.service.appqoe import AppqoeParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import BasicGre, InterfaceGreParcel
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec import (
+    InterfaceIpsecParcel,
+    IpsecAddress,
+    IpsecTunnelMode,
+)
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviParcel
 from catalystwan.models.configuration.feature_profile.sdwan.system import (
     AAAParcel,
@@ -124,6 +129,27 @@ service_interface_parcels = [
             parcel_description="Test Ethernet Parcel",
             interface_name=as_global("HundredGigE"),
             ethernet_description=as_global("Test Ethernet Description"),
+        ),
+    ),
+    (
+        "ipsec",
+        InterfaceIpsecParcel(
+            parcel_name="TestIpsecParcel",
+            parcel_description="Test Ipsec Parcel",
+            interface_name=as_global("ipsec2"),
+            ipsec_description=as_global("Test Ipsec Description"),
+            pre_shared_secret=as_global("123"),
+            ike_local_id=as_global("123"),
+            ike_remote_id=as_global("123"),
+            application=as_variable("{{ipsec_application}}"),
+            tunnel_mode=Global[IpsecTunnelMode](value="ipv6"),
+            tunnel_destination_v6=as_variable("{{ipsec_tunnelDestinationV6}}"),
+            tunnel_source_v6=Global[str](value="::"),
+            tunnel_source_interface=as_variable("{{ipsec_ipsecSourceInterface}}"),
+            ipv6_address=as_variable("{{test}}"),
+            address=IpsecAddress(address=as_global("10.0.0.1"), mask=as_global("255.255.255.0")),
+            tunnel_destination=IpsecAddress(address=as_global("10.0.0.5"), mask=as_global("255.255.255.0")),
+            mtu_v6=as_variable("{{test}}"),
         ),
     ),
 ]

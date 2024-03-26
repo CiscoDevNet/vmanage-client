@@ -1,6 +1,6 @@
 from ipaddress import IPv4Address
 
-from catalystwan.api.configuration_groups.parcel import Global, as_global
+from catalystwan.api.configuration_groups.parcel import Global, as_global, as_variable
 from catalystwan.integration_tests.feature_profile.sdwan.base import TestFeatureProfileModels
 from catalystwan.models.configuration.feature_profile.sdwan.service.dhcp_server import (
     AddressPool,
@@ -9,6 +9,11 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.dhcp_server 
 )
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import BasicGre, InterfaceGreParcel
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec import (
+    InterfaceIpsecParcel,
+    IpsecAddress,
+    IpsecTunnelMode,
+)
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnParcel
 
@@ -93,11 +98,37 @@ class TestServiceFeatureProfileVPNInterfaceModels(TestFeatureProfileModels):
         ethernet_parcel = InterfaceEthernetParcel(
             parcel_name="TestEthernetParcel",
             parcel_description="Test Ethernet Parcel",
-            if_name=as_global("HundredGigE"),
+            interface_name=as_global("HundredGigE"),
             ethernet_description=as_global("Test Ethernet Description"),
         )
         # Act
         parcel_id = self.api.create_parcel(self.profile_uuid, ethernet_parcel, self.vpn_parcel_uuid).id
+        # Assert
+        assert parcel_id
+
+    def test_when_default_values_ipsec_parcel_expect_successful_post(self):
+        # Arrange
+        self.maxDiff = None
+        ipsec_parcel = InterfaceIpsecParcel(
+            parcel_name="TestIpsecParcel",
+            parcel_description="Test Ipsec Parcel",
+            interface_name=as_global("ipsec2"),
+            ipsec_description=as_global("Test Ipsec Description"),
+            pre_shared_secret=as_global("123"),
+            ike_local_id=as_global("123"),
+            ike_remote_id=as_global("123"),
+            application=as_variable("{{ipsec_application}}"),
+            tunnel_mode=Global[IpsecTunnelMode](value="ipv6"),
+            tunnel_destination_v6=as_variable("{{ipsec_tunnelDestinationV6}}"),
+            tunnel_source_v6=Global[str](value="::"),
+            tunnel_source_interface=as_variable("{{ipsec_ipsecSourceInterface}}"),
+            ipv6_address=as_variable("{{test}}"),
+            address=IpsecAddress(address=as_global("10.0.0.1"), mask=as_global("255.255.255.0")),
+            tunnel_destination=IpsecAddress(address=as_global("10.0.0.5"), mask=as_global("255.255.255.0")),
+            mtu_v6=as_variable("{{test}}"),
+        )
+        # Act
+        parcel_id = self.api.create_parcel(self.profile_uuid, ipsec_parcel, self.vpn_parcel_uuid).id
         # Assert
         assert parcel_id
 

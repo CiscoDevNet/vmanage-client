@@ -7,7 +7,7 @@ from .appqoe import AppqoeParcel
 from .dhcp_server import LanVpnDhcpServerParcel
 from .lan.ethernet import InterfaceEthernetParcel
 from .lan.gre import InterfaceGreParcel
-from .lan.ipsec import InterfaceIpsecData
+from .lan.ipsec import InterfaceIpsecParcel
 from .lan.svi import InterfaceSviParcel
 from .lan.vpn import LanVpnParcel
 
@@ -27,7 +27,7 @@ AnyLanVpnInterfaceParcel = Annotated[
     Union[
         InterfaceEthernetParcel,
         InterfaceGreParcel,
-        InterfaceIpsecData,
+        InterfaceIpsecParcel,
         InterfaceSviParcel,
     ],
     Field(discriminator="type_"),
