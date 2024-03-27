@@ -50,27 +50,34 @@ class UX2ConfigPusher:
         config_groups = self._ux2_config.config_groups
         config_groups_length = len(config_groups)
         for i, transformed_config_group in enumerate(config_groups):
+            self._logger("Creating Configuration Groups", i + 1, config_groups_length)
+            logger.debug(
+                f"Creating config group: {transformed_config_group.config_group.name} "
+                f"with origin uuid: {transformed_config_group.header.origin} "
+                f"and feature profiles: {transformed_config_group.header.subelements}"
+            )
             config_group_payload = transformed_config_group.config_group
             config_group_payload.profiles = self._create_feature_profile_and_parcels(
                 transformed_config_group.header.subelements
             )
             cg_id = self._session.endpoints.configuration_group.create_config_group(config_group_payload).id
-            self._logger("Creating Configuration Groups", i + 1, config_groups_length)
             self._config_rollback.add_config_group(cg_id)
 
     def _create_feature_profile_and_parcels(self, feature_profiles_ids: List[UUID]) -> List[ProfileId]:
         config_group_profiles = []
-        for feature_profile_id in feature_profiles_ids:
+        feature_profile_length = len(feature_profiles_ids)
+        for i, feature_profile_id in enumerate(feature_profiles_ids):
+            self._logger("Creating Feature Profile", i + 1, feature_profile_length)
             transformed_feature_profile = self._config_map.feature_profile_map[feature_profile_id]
-            profile_type = cast(ProfileType, transformed_feature_profile.header.type)
-            if profile_type == "policy-object":
-                logger.debug(f"Skipping policy-object profile: {transformed_feature_profile.feature_profile.name}")
-                continue
             logger.debug(
                 f"Creating feature profile: {transformed_feature_profile.feature_profile.name} "
                 f"with origin uuid: {transformed_feature_profile.header.origin} "
                 f"and parcels: {transformed_feature_profile.header.subelements}"
             )
+            profile_type = cast(ProfileType, transformed_feature_profile.header.type)
+            if profile_type == "policy-object":
+                logger.debug(f"Skipping policy-object profile: {transformed_feature_profile.feature_profile.name}")
+                continue
             pusher = ParcelPusherFactory.get_pusher(self._session, profile_type)
             parcels = [
                 self._config_map.parcel_map[element] for element in transformed_feature_profile.header.subelements

@@ -3,9 +3,9 @@
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
 EndpointProtocol = Literal[
     "tcp",
@@ -23,14 +23,14 @@ CombineBoolean = Literal[
 
 
 class EndpointTcpUdp(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     protocol: Optional[Union[Variable, Global[EndpointProtocol]]] = None
     port: Optional[Union[Variable, Global[int]]] = None
 
 
 class TrackerData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: Union[Variable, Global[str]] = Field(serialization_alias="trackerName", validation_alias="trackerName")
     endpoint_api_url: Optional[Union[Variable, Global[str]]] = Field(
@@ -61,7 +61,7 @@ class TrackerData(BaseModel):
 
 
 class TrackerCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: str
     description: Optional[str] = None
@@ -70,32 +70,23 @@ class TrackerCreationPayload(BaseModel):
 
 
 class TrackerRef(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     tracker_ref: Global[UUID] = Field(serialization_alias="trackerRef", validation_alias="trackerRef")
 
 
-class TrackerGroupData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class TrackerGroupParcel(_ParcelBase):
+    type_: Literal["trackergroup"] = Field(default="trackergroup", exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    tracker_refs: List[TrackerRef] = Field(serialization_alias="trackerRefs", validation_alias="trackerRefs")
+    tracker_refs: List[TrackerRef] = Field(validation_alias=AliasPath("data", "trackerRefs"))
     combine_boolean: Union[Global[CombineBoolean], Variable, Default[CombineBoolean]] = Field(
-        serialization_alias="combineBoolean",
-        validation_alias="combineBoolean",
+        validation_alias=AliasPath("data", "combineBoolean"),
         default=Default[CombineBoolean](value="or"),
     )
 
 
-class TrackerGroupCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: TrackerGroupData
-    metadata: Optional[dict] = None
-
-
 class TrackerAssociationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     parcel_id: str = Field(serialization_alias="parcelId", validation_alias="parcelId")

@@ -2,9 +2,9 @@
 
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
 CountryCode = Literal[
     "AE",
@@ -135,7 +135,7 @@ SecurityType = Literal[
 
 
 class MeStaticIpConfig(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     me_ipv4_address: Union[Global[str], Variable]
     netmask: Union[Global[str], Variable]
@@ -145,7 +145,7 @@ class MeStaticIpConfig(BaseModel):
 
 
 class MeIpConfig(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     me_dynamic_ip_enabled: Union[Global[bool], Default[bool]] = Field(
         serialization_alias="meDynamicIpEnabled",
@@ -156,7 +156,7 @@ class MeIpConfig(BaseModel):
 
 
 class SecurityConfig(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     security_type: Global[SecurityType] = Field(serialization_alias="securityType", validation_alias="securityType")
     radius_server_ip: Optional[Union[Global[str], Variable]] = Field(
@@ -172,7 +172,7 @@ class SecurityConfig(BaseModel):
 
 
 class SSID(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: Global[str]
     admin_state: Union[Global[bool], Variable, Default[bool]] = Field(
@@ -193,28 +193,18 @@ class SSID(BaseModel):
     )
 
 
-class WirelessLanData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class WirelessLanParcel(_ParcelBase):
+    type_: Literal["wirelesslan"] = Field(default="wirelesslan", exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     enable_2_4G: Union[Global[bool], Variable, Default[bool]] = Field(
-        serialization_alias="enable24G", validation_alias="enable24G", default=Default[bool](value=True)
+        validation_alias=AliasPath("data", "enable24G"), default=Default[bool](value=True)
     )
     enable_5G: Union[Global[bool], Variable, Default[bool]] = Field(
-        serialization_alias="enable5G", validation_alias="enable5G", default=Default[bool](value=True)
+        validation_alias=AliasPath("data", "enable5G"), default=Default[bool](value=True)
     )
-    ssid: List[SSID]
-    country: Union[Global[CountryCode], Variable]
-    username: Union[Global[str], Variable]
-    password: Union[Global[str], Variable]
-    me_ip_config: MeIpConfig = Field(
-        serialization_alias="meIpConfig", validation_alias="meIpConfig", default=MeIpConfig()
-    )
-
-
-class WirelessLanCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: WirelessLanData
-    metadata: Optional[dict] = None
+    ssid: List[SSID] = Field(validation_alias=AliasPath("data", "ssid"))
+    country: Union[Global[CountryCode], Variable] = Field(validation_alias=AliasPath("data", "country"))
+    username: Union[Global[str], Variable] = Field(validation_alias=AliasPath("data", "username"))
+    password: Union[Global[str], Variable] = Field(validation_alias=AliasPath("data", "password"))
+    me_ip_config: MeIpConfig = Field(validation_alias=AliasPath("data", "meIpConfig"), default=MeIpConfig())

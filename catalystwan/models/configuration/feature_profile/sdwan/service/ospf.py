@@ -3,9 +3,9 @@
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
 NetworkType = Literal[
     "broadcast",
@@ -39,14 +39,14 @@ MetricType = Literal["type1", "type2"]
 
 
 class SummaryPrefix(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     ip_address: Optional[Union[Global[str], Variable]] = None
     subnet_mask: Optional[Union[Global[str], Variable]] = None
 
 
 class SummaryRoute(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: Optional[SummaryPrefix] = None
     cost: Optional[Union[Global[int], Variable, Default[None]]] = None
@@ -56,7 +56,7 @@ class SummaryRoute(BaseModel):
 
 
 class OspfInterfaceParametres(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: Optional[Union[Global[str], Variable]]
     hello_interval: Optional[Union[Global[int], Variable, Default[int]]] = Field(
@@ -86,7 +86,7 @@ class OspfInterfaceParametres(BaseModel):
 
 
 class OspfArea(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     area_number: Union[Global[int], Variable] = Field(serialization_alias="aNum", validation_alias="aNum")
     area_type: Optional[Union[Global[AreaType], Default[None]]] = Field(
@@ -100,14 +100,14 @@ class OspfArea(BaseModel):
 
 
 class RouterLsa(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     ad_type: Global[AdvertiseType] = Field(serialization_alias="adType", validation_alias="adType")
     time: Optional[Union[Global[int], Variable]] = None
 
 
 class RedistributedRoute(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     protocol: Union[Global[RedistributeProtocol], Variable]
     dia: Optional[Union[Global[bool], Variable, Default[bool]]] = None
@@ -116,50 +116,48 @@ class RedistributedRoute(BaseModel):
     )
 
 
-class OspfData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class OspfParcel(_ParcelBase):
+    type_: Literal["routing/ospf"] = Field(default="routing/ospf", exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     router_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(
-        serialization_alias="routerId", validation_alias="routerId", default=None
+        validation_alias=AliasPath("data", "routerId"), default=None
     )
     reference_bandwidth: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="referenceBandwidth", validation_alias="referenceBandwidth", default=None
+        validation_alias=AliasPath("data", "referenceBandwidth"), default=None
     )
-    rfc1583: Optional[Union[Global[bool], Variable, Default[bool]]] = None
-    originate: Optional[Union[Global[bool], Default[bool]]] = None
-    always: Optional[Union[Global[bool], Variable, Default[bool]]] = None
-    metric: Optional[Union[Global[int], Variable, Default[None]]] = None
+    rfc1583: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
+        validation_alias=AliasPath("data", "rfc1583"), default=None
+    )
+    originate: Optional[Union[Global[bool], Default[bool]]] = Field(
+        validation_alias=AliasPath("data", "originate"), default=None
+    )
+    always: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
+        validation_alias=AliasPath("data", "always"), default=None
+    )
+    metric: Optional[Union[Global[int], Variable, Default[None]]] = Field(
+        validation_alias=AliasPath("data", "metric"), default=None
+    )
     metric_type: Optional[Union[Global[MetricType], Variable, Default[None]]] = Field(
-        serialization_alias="metricType", validation_alias="metricType", default=None
+        validation_alias=AliasPath("data", "metricType"), default=None
     )
     external: Optional[Union[Global[int], Variable, Default[int]]] = None
     inter_area: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="interArea", validation_alias="interArea", default=None
+        validation_alias=AliasPath("data", "interArea"), default=None
     )
     intra_area: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="intraArea", validation_alias="intraArea", default=None
+        validation_alias=AliasPath("data", "intraArea"), default=None
     )
     delay: Optional[Union[Global[int], Variable, Default[int]]] = None
     initial_hold: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="initialHold", validation_alias="initialHold", default=None
+        validation_alias=AliasPath("data", "initialHold"), default=None
     )
     max_hold: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="maxHold", validation_alias="maxHold", default=None
+        validation_alias=AliasPath("data", "maxHold"), default=None
     )
     redistribute: Optional[List[RedistributedRoute]] = None
-    router_lsa: Optional[List[RouterLsa]] = Field(
-        serialization_alias="routerLsa", validation_alias="routerLsa", default=None
-    )
+    router_lsa: Optional[List[RouterLsa]] = Field(validation_alias=AliasPath("data", "routerLsa"), default=None)
     route_policy: Optional[Union[Default[None], Global[UUID]]] = Field(
-        serialization_alias="routePolicy", validation_alias="routePolicy", default=None
+        validation_alias=AliasPath("data", "routePolicy"), default=None
     )
-    area: Optional[List[OspfArea]] = None
-
-
-class OspfCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: OspfData
-    metadata: Optional[dict] = None
+    area: Optional[List[OspfArea]] = Field(validation_alias=AliasPath("data", "area"), default=None)

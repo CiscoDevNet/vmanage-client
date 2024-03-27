@@ -3,9 +3,9 @@
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global
+from catalystwan.api.configuration_groups.parcel import Default, Global, _ParcelBase
 
 Action = Literal[
     "reject",
@@ -37,7 +37,7 @@ Origin = Literal[
 
 
 class StandardCommunityList(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     criteria: Union[Global[Criteria], Default[Criteria]] = Default[Criteria](value="or")
     standard_community_list: List[Global[UUID]] = Field(
@@ -46,7 +46,7 @@ class StandardCommunityList(BaseModel):
 
 
 class ExpandedCommunityList(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     expanded_community_list: Global[UUID] = Field(
         serialization_alias="expandedCommunityList", validation_alias="expandedCommunityList"
@@ -54,7 +54,7 @@ class ExpandedCommunityList(BaseModel):
 
 
 class RoutePolicyMatch(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     as_path_list: Optional[Global[UUID]] = Field(
         serialization_alias="asPathList", validation_alias="asPathList", default=None
@@ -86,7 +86,7 @@ class RoutePolicyMatch(BaseModel):
 
 
 class AcceptAction(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     enable_accept_action: Default[bool] = Default[bool](value=True)
     set_as_path: Optional[Global[int]] = Field(
@@ -125,19 +125,19 @@ class AcceptAction(BaseModel):
 
 
 class AcceptActions(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     accept: AcceptAction
 
 
 class RejectActions(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     reject: Default[bool] = Default[bool](value=True)
 
 
 class RoutePolicySequence(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     sequence_id: Global[int] = Field(serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: Global[str] = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
@@ -151,21 +151,11 @@ class RoutePolicySequence(BaseModel):
     actions: Optional[List[Union[AcceptActions, RejectActions]]] = None
 
 
-class RoutePolicyData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class RoutePolicyData(_ParcelBase):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     defautl_action: Union[Global[Action], Default[Action]] = Field(
-        serialization_alias="defaultAction",
-        validation_alias="defaultAction",
+        validation_alias=AliasPath("data", "defaultAction"),
         default=Default[Action](value="reject"),
     )
-    sequences: List[RoutePolicySequence] = []
-
-
-class RoutePolicyCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: RoutePolicyData
-    metadata: Optional[dict] = None
+    sequences: List[RoutePolicySequence] = Field(default_factory=list, validation_alias=AliasPath("data", "sequences"))

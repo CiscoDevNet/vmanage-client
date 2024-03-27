@@ -2,13 +2,13 @@
 
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
 
 class StaticMacAddress(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     mac_address: Union[Global[str], Variable] = Field(serialization_alias="macaddr", validation_alias="macaddr")
     vlan: Union[Global[int], Variable]
@@ -47,7 +47,7 @@ ControlDirection = Literal[
 
 
 class SwitchportInterface(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     interface_name: Union[Global[str], Variable] = Field(serialization_alias="ifName", validation_alias="ifName")
     mode: Optional[Global[SwitchportMode]] = None
@@ -100,22 +100,16 @@ class SwitchportInterface(BaseModel):
     )
 
 
-class SwitchportData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class SwitchportParcel(_ParcelBase):
+    type_: Literal["switchport"] = Field(default="switchport", exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    interface: Optional[List[SwitchportInterface]] = None
+    interface: Optional[List[SwitchportInterface]] = Field(
+        default=None, validation_alias=AliasPath("data", "interface")
+    )
     age_time: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        serialization_alias="ageTime", validation_alias="ageTime", default=Default[int](value=300)
+        validation_alias=AliasPath("data", "ageTime"), default=Default[int](value=300)
     )
     static_mac_address: Optional[List[StaticMacAddress]] = Field(
         serialization_alias="staticMacAddress", validation_alias="staticMacAddress", default=None
     )
-
-
-class SwitchportCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: SwitchportData
-    metadata: Optional[dict] = None

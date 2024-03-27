@@ -3,9 +3,9 @@
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
 ObjectTrackerType = Literal[
     "Interface",
@@ -21,7 +21,7 @@ Criteria = Literal[
 
 
 class SigTracker(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
     object_tracker_type: Global[ObjectTrackerType] = Field(
@@ -32,7 +32,7 @@ class SigTracker(BaseModel):
 
 
 class InterfaceTracker(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
     object_tracker_type: Global[ObjectTrackerType] = Field(
@@ -44,7 +44,7 @@ class InterfaceTracker(BaseModel):
 
 
 class RouteTracker(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
     object_tracker_type: Global[ObjectTrackerType] = Field(
@@ -60,7 +60,7 @@ class RouteTracker(BaseModel):
 
 
 class ObjectTrackerCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: str
     description: Optional[str] = None
@@ -68,23 +68,17 @@ class ObjectTrackerCreationPayload(BaseModel):
 
 
 class ObjectTrackerRef(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     tracker_ref: Global[UUID] = Field(serialization_alias="trackerRef", validation_alias="trackerRef")
 
 
-class ObjectTrackerGroupData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class ObjectTrackerGroupParcel(_ParcelBase):
+    type_: Literal["trackergroup"] = Field(default="trackergroup", exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
-    tracker_refs: List[ObjectTrackerRef] = Field(serialization_alias="trackerRefs", validation_alias="trackerRefs")
-    criteria: Union[Global[Criteria], Variable, Default[Criteria]] = Default[Criteria](value="or")
-
-
-class ObjectTrackerGroupCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: ObjectTrackerGroupData
-    metadata: Optional[dict] = None
+    object_id: Union[Global[int], Variable] = Field(validation_alias=AliasPath("data", "objectId"))
+    tracker_refs: List[ObjectTrackerRef] = Field(validation_alias=AliasPath("data", "trackerRefs"))
+    criteria: Union[Global[Criteria], Variable, Default[Criteria]] = Field(
+        validation_alias=AliasPath("data", "trackerRefs"), default=Default[Criteria](value="or")
+    )

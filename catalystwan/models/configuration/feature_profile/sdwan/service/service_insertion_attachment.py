@@ -3,9 +3,9 @@
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
 AttachmentType = Literal[
     "custom",
@@ -53,7 +53,7 @@ ServiceType = Literal[
 
 
 class GatewayInterface(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     interface_name: Optional[Union[Global[str], Variable]] = Field(
         serialization_alias="gatewayInterfaceName", validation_alias="gatewayInterfaceName", default=None
@@ -67,7 +67,7 @@ class GatewayInterface(BaseModel):
 
 
 class ServiceInterface(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     interface_name: Optional[Union[Global[str], Variable]] = Field(
         serialization_alias="serviceInterfaceName", validation_alias="serviceInterfaceName", default=None
@@ -81,14 +81,14 @@ class ServiceInterface(BaseModel):
 
 
 class TrackingIP(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     ipv4: Optional[Union[Global[str], Variable]] = None
     ipv6: Optional[Union[Global[str], Variable]] = None
 
 
 class ReachableInterface(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     type: Global[ReachableInterfaceType] = Field(
         serialization_alias="reachableInterfaceType", validation_alias="reachableInterfaceType"
@@ -114,7 +114,7 @@ class ReachableInterface(BaseModel):
 
 
 class InterfaceProperties(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     gateway_interface: Optional[GatewayInterface] = Field(
         serialization_alias="gatewayInterface", validation_alias="gatewayInterface", default=None
@@ -134,7 +134,7 @@ class InterfaceProperties(BaseModel):
 
 
 class Attachment(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     interface_properties: List[InterfaceProperties] = Field(
         serialization_alias="interfaceProperties", validation_alias="interfaceProperties"
@@ -145,7 +145,7 @@ class Attachment(BaseModel):
 
 
 class TrackConfig(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     interval: Optional[Union[Global[int], Variable]] = None
     threshold: Optional[Union[Global[int], Variable]] = None
@@ -153,7 +153,7 @@ class TrackConfig(BaseModel):
 
 
 class Service(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     service_type: Union[Global[ServiceType], Variable] = Field(
         serialization_alias="serviceType", validation_alias="serviceType"
@@ -168,25 +168,17 @@ class Service(BaseModel):
     attachments: Optional[List[Attachment]] = None
 
 
-class ServiceInsertionAttachmentData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class ServiceInsertionAttachmentParcel(_ParcelBase):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     attachment_type: Optional[Union[Global[AttachmentType], Variable]] = Field(
-        serialization_alias="attachmentType", validation_alias="attachmentType", default=None
+        validation_alias=AliasPath("data", "attachmentType"), default=None
     )
     service_chain_instance_id: Optional[Union[Global[str], Variable]] = Field(
-        serialization_alias="serviceChainInstanceID", validation_alias="serviceChainInstanceID", default=None
+        validation_alias=AliasPath("data", "serviceChainInstanceID"), default=None
     )
     service_chain_definition_id: Global[UUID] = Field(
-        serialization_alias="serviceChainDefinitionID", validation_alias="serviceChainDefinitionID"
+        validation_alias=AliasPath("data", "serviceChainDefinitionID"),
     )
-    vpn: Union[Global[int], Variable]
-    services: Optional[List[Service]] = None
-
-
-class ServiceInsertionAttachmentCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: ServiceInsertionAttachmentData
+    vpn: Union[Global[int], Variable] = Field(validation_alias=AliasPath("data", "vpn"))
+    services: Optional[List[Service]] = Field(default=None, validation_alias=AliasPath("data", "services"))

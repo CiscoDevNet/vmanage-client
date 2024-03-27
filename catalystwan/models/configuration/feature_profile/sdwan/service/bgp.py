@@ -3,14 +3,14 @@
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 from catalystwan.models.configuration.feature_profile.common import Prefix
 
 
 class AggregatePrefix(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     prefix: Prefix
     as_set: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
@@ -22,7 +22,7 @@ class AggregatePrefix(BaseModel):
 
 
 class AggregatePrefixIPv6(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     prefix: Union[Global[str], Variable]
     as_set: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
@@ -34,13 +34,13 @@ class AggregatePrefixIPv6(BaseModel):
 
 
 class NetworkPrefix(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     prefix: Prefix
 
 
 class NetworkPrefixIPv6(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     prefix: Union[Global[str], Variable]
 
@@ -65,7 +65,7 @@ RedistributeProtocolIPv6 = Literal[
 
 
 class RedistributedRoute(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     protocol: Union[Global[RedistributeProtocol], Variable]
     route_policy: Optional[Union[Default[None], Global[UUID]]] = Field(
@@ -74,7 +74,7 @@ class RedistributedRoute(BaseModel):
 
 
 class RedistributedRouteIPv6(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     protocol: Union[Global[RedistributeProtocolIPv6], Variable]
     route_policy: Optional[Union[Default[None], Global[UUID]]] = Field(
@@ -83,7 +83,7 @@ class RedistributedRouteIPv6(BaseModel):
 
 
 class AddressFamilyIPv4(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     aggregate_address: Optional[List[AggregatePrefix]] = Field(
         serialization_alias="aggregateAddress", validation_alias="aggregateAddress"
@@ -97,13 +97,13 @@ class AddressFamilyIPv4(BaseModel):
 
 
 class PolicyType(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     policy_type: Global[str] = Field(serialization_alias="policyType", validation_alias="policyType")
 
 
 class PolicyTypeWithThreshold(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     policy_type: Global[str] = Field(serialization_alias="policyType", validation_alias="policyType")
     prefix_number: Union[Global[int], Variable] = Field(serialization_alias="prefixNum", validation_alias="prefixNum")
@@ -111,7 +111,7 @@ class PolicyTypeWithThreshold(BaseModel):
 
 
 class PolicyTypeWithRestart(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     policy_type: Global[str] = Field(serialization_alias="policyType", validation_alias="policyType")
     prefix_number: Union[Global[int], Variable] = Field(serialization_alias="prefixNum", validation_alias="prefixNum")
@@ -120,7 +120,7 @@ class PolicyTypeWithRestart(BaseModel):
 
 
 class AddressFamilyIPv6(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     aggregate_address: Optional[List[AggregatePrefixIPv6]] = Field(
         serialization_alias="ipv6AggregateAddress", validation_alias="ipv6AggregateAddress"
@@ -136,7 +136,7 @@ class AddressFamilyIPv6(BaseModel):
 
 
 class BgpAddressFamily(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     family_type: Global[str] = Field(serialization_alias="familyType", validation_alias="familyType")
     max_prefix_config: Optional[Union[PolicyType, PolicyTypeWithRestart, PolicyTypeWithThreshold]] = Field(
@@ -151,7 +151,7 @@ class BgpAddressFamily(BaseModel):
 
 
 class BgpIPv4Neighbor(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: Union[Global[str], Variable]
     description: Optional[Union[Global[str], Variable, Default[None]]] = None
@@ -193,7 +193,7 @@ class BgpIPv4Neighbor(BaseModel):
 
 
 class BgpIPv6Neighbor(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: Union[Global[str], Variable]
     description: Optional[Union[Global[str], Variable, Default[None]]] = None
@@ -234,55 +234,58 @@ class BgpIPv6Neighbor(BaseModel):
     )
 
 
-class BgpData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class BgpParcel(_ParcelBase):
+    type_: Literal["routing/bgp"] = Field(default="routing/bgp", exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    as_num: Union[Global[int], Variable] = Field(serialization_alias="asNum", validation_alias="asNum")
+    as_num: Union[Global[int], Variable] = Field(validation_alias=AliasPath("data", "asNum"))
     router_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(
-        serialization_alias="routerId", validation_alias="routerId", default=None
+        validation_alias=AliasPath("data", "routerId"), default=None
     )
     propagate_aspath: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
-        serialization_alias="propagateAspath", validation_alias="propagateAspath", default=Default[bool](value=False)
+        validation_alias=AliasPath("data", "propagateAspath"), default=Default[bool](value=False)
     )
     propagate_community: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
-        serialization_alias="propagateCommunity",
-        validation_alias="propagateCommunity",
+        validation_alias=AliasPath("data", "propagateCommunity"),
         default=Default[bool](value=False),
     )
-    external: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=20)
-    internal: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=200)
-    local: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=20)
-    keepalive: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=60)
-    holdtime: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=180)
-    always_compare: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
-        serialization_alias="alwaysCompare", validation_alias="alwaysCompare", default=Default[bool](value=False)
+    external: Optional[Union[Global[int], Variable, Default[int]]] = Field(
+        validation_alias=AliasPath("data", "external"), default=Default[int](value=20)
     )
-    deterministic: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
+    internal: Optional[Union[Global[int], Variable, Default[int]]] = Field(
+        validation_alias=AliasPath("data", "internal"), default=Default[int](value=200)
+    )
+    local: Optional[Union[Global[int], Variable, Default[int]]] = Field(
+        validation_alias=AliasPath("data", "local"), default=Default[int](value=20)
+    )
+    keepalive: Optional[Union[Global[int], Variable, Default[int]]] = Field(
+        validation_alias=AliasPath("data", "keepalive"), default=Default[int](value=60)
+    )
+    holdtime: Optional[Union[Global[int], Variable, Default[int]]] = Field(
+        validation_alias=AliasPath("data", "holdtime"), default=Default[int](value=180)
+    )
+    always_compare: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
+        validation_alias=AliasPath("data", "alwaysCompare"), default=Default[bool](value=False)
+    )
+    deterministic: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
+        validation_alias=AliasPath("data", "deterministic"), default=Default[bool](value=False)
+    )
     missing_as_worst: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
-        serialization_alias="missingAsWorst", validation_alias="missingAsWorst", default=Default[bool](value=False)
+        validation_alias=AliasPath("data", "missingAsWorst"), default=Default[bool](value=False)
     )
     compare_router_id: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
-        serialization_alias="compareRouterId", validation_alias="compareRouterId", default=Default[bool](value=False)
+        validation_alias=AliasPath("data", "compareRouterId"), default=Default[bool](value=False)
     )
     multipath_relax: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
-        serialization_alias="multipathRelax", validation_alias="multipathRelax", default=Default[bool](value=False)
+        validation_alias=AliasPath("data", "multipathRelax"), default=Default[bool](value=False)
     )
-    neighbor: Optional[List[BgpIPv4Neighbor]] = None
+    neighbor: Optional[List[BgpIPv4Neighbor]] = Field(validation_alias=AliasPath("data", "neighbor"), default=None)
     ipv6_neighbor: Optional[List[BgpIPv6Neighbor]] = Field(
-        serialization_alias="ipv6Neighbor", validation_alias="ipv6Neighbor", default=None
+        validation_alias=AliasPath("data", "ipv6Neighbor"), default=None
     )
     address_family: Optional[AddressFamilyIPv4] = Field(
-        serialization_alias="addressFamily", validation_alias="addressFamily", default=None
+        validation_alias=AliasPath("data", "addressFamily"), default=None
     )
     ipv6_address_family: Optional[AddressFamilyIPv6] = Field(
-        serialization_alias="ipv6AddressFamily", validation_alias="ipv6AddressFamily", default=None
+        validation_alias=AliasPath("data", "ipv6AddressFamily"), default=None
     )
-
-
-class BgpCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: BgpData
-    metadata: Optional[dict] = None

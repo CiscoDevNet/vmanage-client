@@ -3,9 +3,9 @@
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 from catalystwan.models.common import ServiceChainNumber
 
 Action = Literal[
@@ -116,7 +116,7 @@ Icmp6Message = Literal[
 
 
 class SourceDataIPv4Prefix(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     source_ip_prefix: Union[Global[str], Variable] = Field(
         serialization_alias="sourceIpPrefix", validation_alias="sourceIpPrefix"
@@ -124,7 +124,7 @@ class SourceDataIPv4Prefix(BaseModel):
 
 
 class SourceDataIPv6Prefix(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     source_ip_prefix: Union[Global[str], Variable] = Field(
         serialization_alias="sourceIpPrefix", validation_alias="sourceIpPrefix"
@@ -132,7 +132,7 @@ class SourceDataIPv6Prefix(BaseModel):
 
 
 class SourceDataIPv4PrefixParcel(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     source_data_prefix_list: Global[UUID] = Field(
         serialization_alias="sourceDataPrefixList", validation_alias="sourceDataPrefixList"
@@ -140,7 +140,7 @@ class SourceDataIPv4PrefixParcel(BaseModel):
 
 
 class SourceDataIPv6PrefixParcel(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     source_data_prefix_list: Global[UUID] = Field(
         serialization_alias="sourceDataPrefixList", validation_alias="sourceDataPrefixList"
@@ -148,13 +148,13 @@ class SourceDataIPv6PrefixParcel(BaseModel):
 
 
 class SourcePort(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     source_port: Global[int] = Field(serialization_alias="sourcePort", validation_alias="sourcePort")
 
 
 class DestinationDataIPv4Prefix(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     destination_ip_prefix: Union[Global[str], Variable] = Field(
         serialization_alias="destinationIpPrefix", validation_alias="destinationIpPrefix"
@@ -162,7 +162,7 @@ class DestinationDataIPv4Prefix(BaseModel):
 
 
 class DestinationDataIPv6Prefix(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     destination_ip_prefix: Union[Global[str], Variable] = Field(
         serialization_alias="destinationIpPrefix", validation_alias="destinationIpPrefix"
@@ -170,7 +170,7 @@ class DestinationDataIPv6Prefix(BaseModel):
 
 
 class DestinationDataIPv4PrefixParcel(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     destination_data_prefix_list: Global[UUID] = Field(
         serialization_alias="destinationDataPrefixList", validation_alias="destinationDataPrefixList"
@@ -178,7 +178,7 @@ class DestinationDataIPv4PrefixParcel(BaseModel):
 
 
 class DestinationDataIPv6PrefixParcel(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     destination_data_prefix_list: Global[UUID] = Field(
         serialization_alias="destinationDataPrefixList", validation_alias="destinationDataPrefixList"
@@ -186,7 +186,7 @@ class DestinationDataIPv6PrefixParcel(BaseModel):
 
 
 class DestinationPort(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     destination_port: Global[int] = Field(serialization_alias="destinationPort", validation_alias="destinationPort")
 
@@ -195,7 +195,7 @@ TcpState = Literal["syn"]
 
 
 class IPv4Match(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     dscp: Optional[Global[List[int]]] = None
     packet_length: Optional[Global[int]] = Field(
@@ -221,7 +221,7 @@ class IPv4Match(BaseModel):
 
 
 class IPv6Match(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     next_header: Optional[Global[int]] = Field(
         serialization_alias="nextHeader", validation_alias="nextHeader", default=None
@@ -249,7 +249,7 @@ class IPv6Match(BaseModel):
 
 
 class ServiceChain(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     service_chain_number: Union[Global[ServiceChainNumber], Variable] = Field(
         serialization_alias="serviceChainNumber", validation_alias="serviceChainNumber"
@@ -259,7 +259,7 @@ class ServiceChain(BaseModel):
 
 
 class AcceptActionIPv4(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     set_dscp: Optional[Global[int]] = Field(serialization_alias="setDscp", validation_alias="setDscp", default=None)
     counter_name: Optional[Global[str]] = Field(
@@ -277,7 +277,7 @@ class AcceptActionIPv4(BaseModel):
 
 
 class AcceptActionIPv6(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     counter_name: Optional[Global[str]] = Field(
         serialization_alias="counterName", validation_alias="counterName", default=None
@@ -297,7 +297,7 @@ class AcceptActionIPv6(BaseModel):
 
 
 class DropAction(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     counter_name: Optional[Global[str]] = Field(
         serialization_alias="counterName", validation_alias="counterName", default=None
@@ -306,25 +306,25 @@ class DropAction(BaseModel):
 
 
 class AcceptActionsIPv4(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     accept: AcceptActionIPv4
 
 
 class AcceptActionsIPv6(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     accept: AcceptActionIPv6
 
 
 class DropActions(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     drop: DropAction
 
 
 class IPv4SequenceBaseAction(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     sequence_id: Global[int] = Field(serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: Global[str] = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
@@ -337,7 +337,7 @@ class IPv4SequenceBaseAction(BaseModel):
 
 
 class IPv6SequenceBaseAction(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     sequence_id: Global[int] = Field(serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: Global[str] = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
@@ -350,7 +350,7 @@ class IPv6SequenceBaseAction(BaseModel):
 
 
 class IPv4SequenceActions(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     sequence_id: Global[int] = Field(serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: Global[str] = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
@@ -363,7 +363,7 @@ class IPv4SequenceActions(BaseModel):
 
 
 class IPv6SequenceActions(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     sequence_id: Global[int] = Field(serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: Global[str] = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
@@ -375,35 +375,23 @@ class IPv6SequenceActions(BaseModel):
     )
 
 
-class IPv4AclData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class IPv4AclParcel(_ParcelBase):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     defautl_action: Union[Global[Action], Default[Action]] = Field(
-        serialization_alias="defaultAction", validation_alias="defaultAction", default=Default[Action](value="drop")
+        validation_alias=AliasPath("data", "defaultAction"), default=Default[Action](value="drop")
     )
-    sequences: List[Union[IPv4SequenceBaseAction, IPv4SequenceActions]]
+    sequences: List[Union[IPv4SequenceBaseAction, IPv4SequenceActions]] = Field(
+        validation_alias=AliasPath("data", "sequences")
+    )
 
 
-class IPv4AclCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: IPv4AclData
-
-
-class IPv6AclData(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+class IPv6AclParcel(_ParcelBase):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     defautl_action: Union[Global[Action], Default[Action]] = Field(
-        serialization_alias="defaultAction", validation_alias="defaultAction", default=Default[Action](value="drop")
+        validation_alias=AliasPath("data", "defaultAction"), default=Default[Action](value="drop")
     )
-    sequences: List[Union[IPv6SequenceBaseAction, IPv6SequenceActions]]
-
-
-class IPv6AclCreationPayload(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    name: str
-    description: Optional[str] = None
-    data: IPv6AclData
+    sequences: List[Union[IPv6SequenceBaseAction, IPv6SequenceActions]] = Field(
+        validation_alias=AliasPath("data", "sequences")
+    )
