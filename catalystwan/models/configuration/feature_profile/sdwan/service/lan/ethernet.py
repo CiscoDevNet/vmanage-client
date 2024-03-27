@@ -74,7 +74,7 @@ class DynamicIPv6Dhcp(BaseModel):
         serialization_alias="dhcpClient", validation_alias="dhcpClient", default=Global[dict](value={})
     )
     secondary_ipv6_address: Optional[List[StaticIPv6Address]] = Field(
-        serialization_alias="secondaryIpV6Address", validation_alias="secondaryIpV6Address"
+        serialization_alias="secondaryIpV6Address", validation_alias="secondaryIpV6Address", default=None
     )
 
 
