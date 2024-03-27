@@ -79,7 +79,7 @@ class StaticLeaseItem(BaseModel):
     @field_validator("mac_address")
     @classmethod
     def check_mac_address(cls, mac_address: Union[Global[str], Variable]):
-        if isinstance(mac_address, Variable):
+        if mac_address.option_type == "variable":
             return mac_address
         value = mac_address.value
         if MAC_PATTERN_1.match(value) or MAC_PATTERN_2.match(value):

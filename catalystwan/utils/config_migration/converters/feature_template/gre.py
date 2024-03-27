@@ -2,7 +2,7 @@ from copy import deepcopy
 from ipaddress import IPv4Interface
 from typing import Tuple
 
-from catalystwan.api.configuration_groups.parcel import as_global
+from catalystwan.api.configuration_groups.parcel import as_global, as_variable
 from catalystwan.models.configuration.feature_profile.sdwan.service import InterfaceGreParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common import IkeGroup
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import (
@@ -14,6 +14,8 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre impo
 
 class InterfaceGRETemplateConverter:
     supported_template_types = ("cisco_vpn_interface_gre",)
+
+    tunnel_destination_ip4 = "{{gre_tunnelDestination_ip4}}"
 
     delete_keys = (
         "dead_peer_detection",
@@ -42,11 +44,13 @@ class InterfaceGRETemplateConverter:
         Returns:
             InterfaceGreParcel: The created InterfaceGreParcel object.
         """
+        print(template_values)
         basic_values, advanced_values = self.prepare_values(template_values)
         self.configure_dead_peer_detection(basic_values)
         self.configure_ike(basic_values)
         self.configure_ipsec(basic_values)
-        self.configure_tunnel(basic_values)
+        self.configure_tunnel_source_v6(basic_values)
+        self.configure_tunnel_destination(basic_values)
         self.configure_ipv6_address(basic_values)
         self.configure_gre_address(basic_values)
         self.cleanup_keys(basic_values)
@@ -97,7 +101,10 @@ class InterfaceGRETemplateConverter:
     def configure_ipsec(self, values: dict) -> None:
         values.update(values.get("ipsec", {}))
 
-    def configure_tunnel(self, values: dict) -> None:
+    def configure_tunnel_destination(self, values: dict) -> None:
+        values["tunnel_destination"] = values.get("tunnel_destination", as_variable(self.tunnel_destination_ip4))
+
+    def configure_tunnel_source_v6(self, values: dict) -> None:
         if tunnel_source_v6 := values.get("tunnel_source_v6"):
             values["tunnel_source_type"] = GreSourceIPv6(
                 source_ipv6=TunnelSourceIPv6(

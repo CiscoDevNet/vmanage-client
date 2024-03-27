@@ -113,7 +113,7 @@ class BasicGre(BaseModel):
         serialization_alias="tunnelSourceType", validation_alias="tunnelSourceType", default=None
     )
     tunnel_destination: Union[Global[str], Global[IPv4Address], Variable] = Field(
-        serialization_alias="tunnelDestination", validation_alias="tunnelDestination", default=None
+        serialization_alias="tunnelDestination", validation_alias="tunnelDestination"
     )
     tunnel_destination_v6: Optional[Union[Global[str], Global[IPv6Address], Variable]] = Field(
         default=None, serialization_alias="tunnelDestinationV6", validation_alias="tunnelDestinationV6"

@@ -246,9 +246,8 @@ class InterfaceEthernetTemplateConverter:
             if isinstance(nat, dict):
                 # Nat can be straight up Global[bool] or a dict with more values
                 nat_type = nat.get("nat_choice", as_variable(self.nat_attribute_nat_choice))
-                if isinstance(nat_type, Global):
-                    if nat_type.value.lower() == "interface":  # There is no "interface" value for natType in UX2
-                        nat_type = as_variable(self.nat_attribute_nat_choice)
+                if nat_type.value.lower() == "interface":
+                    nat_type = as_variable(self.nat_attribute_nat_choice)
                 values["nat_attributes_ipv4"] = NatAttributesIPv4(
                     nat_type=nat_type,
                     nat_pool=self.get_nat_pool(nat),
