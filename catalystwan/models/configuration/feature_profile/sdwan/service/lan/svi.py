@@ -41,7 +41,7 @@ class VrrpIPv4(BaseModel):
         serialization_alias="ipAddress", validation_alias="ipAddress"
     )
     ip_address_secondary: Optional[List[VrrpIPv4SecondaryAddress]] = Field(
-        serialization_alias="ipAddressSecondary", validation_alias="ipAddressSecondary"
+        serialization_alias="ipAddressSecondary", validation_alias="ipAddressSecondary", default=None
     )
     tloc_pref_change: Union[Global[bool], Default[bool]] = Field(
         serialization_alias="tlocPrefChange", validation_alias="tlocPrefChange", default=Default[bool](value=False)
