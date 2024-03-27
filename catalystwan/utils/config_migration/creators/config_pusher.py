@@ -1,12 +1,17 @@
 import logging
-from typing import Dict, List, Tuple, cast
+from typing import Callable, Dict, List, cast
 from uuid import UUID
 
 from pydantic import BaseModel
 
 from catalystwan.endpoints.configuration_group import ProfileId
 from catalystwan.exceptions import ManagerHTTPError
-from catalystwan.models.configuration.config_migration import TransformedFeatureProfile, TransformedParcel, UX2Config
+from catalystwan.models.configuration.config_migration import (
+    TransformedFeatureProfile,
+    TransformedParcel,
+    UX2Config,
+    UX2ConfigRollback,
+)
 from catalystwan.models.configuration.feature_profile.common import ProfileType
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.factories.parcel_pusher import ParcelPusherFactory
@@ -20,9 +25,7 @@ class ConfigurationMapping(BaseModel):
 
 
 class UX2ConfigPusher:
-    def __init__(
-        self, session: ManagerSession, ux2_config: UX2Config, logger: Callable[[str, int, int], None]
-    ) -> None:
+    def __init__(self, session: ManagerSession, ux2_config: UX2Config, logger: Callable[[str, int, int], None]) -> None:
         self._session = session
         self._config_map = self._create_config_map(ux2_config)
         self._config_rollback = UX2ConfigRollback()
