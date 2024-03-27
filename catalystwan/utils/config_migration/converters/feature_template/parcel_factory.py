@@ -24,6 +24,7 @@ from .logging_ import LoggingTemplateConverter
 from .normalizer import template_definition_normalization
 from .ntp import NTPTemplateConverter
 from .omp import OMPTemplateConverter
+from .ospf import OspfTemplateConverter
 from .security import SecurityTemplateConverter
 from .svi import InterfaceSviTemplateConverter
 from .thousandeyes import ThousandEyesTemplateConverter
@@ -53,6 +54,7 @@ available_converters = [
     InterfaceSviTemplateConverter,
     InterfaceEthernetTemplateConverter,
     InterfaceIpsecTemplateConverter,
+    OspfTemplateConverter,
 ]
 
 

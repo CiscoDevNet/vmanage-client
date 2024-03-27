@@ -1,11 +1,13 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
+from ipaddress import IPv4Address
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
+from catalystwan.models.common import MetricType
 
 NetworkType = Literal[
     "broadcast",
@@ -26,7 +28,7 @@ AdvertiseType = Literal[
     "on-startup",
 ]
 
-RedistributeProtocol = Literal[
+RedistributeProtocolOspf = Literal[
     "static",
     "connected",
     "bgp",
@@ -34,8 +36,6 @@ RedistributeProtocol = Literal[
     "nat",
     "eigrp",
 ]
-
-MetricType = Literal["type1", "type2"]
 
 
 class SummaryPrefix(BaseModel):
@@ -109,9 +109,9 @@ class RouterLsa(BaseModel):
 class RedistributedRoute(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    protocol: Union[Global[RedistributeProtocol], Variable]
+    protocol: Union[Global[RedistributeProtocolOspf], Variable]
     dia: Optional[Union[Global[bool], Variable, Default[bool]]] = None
-    route_policy: Optional[Union[Default[None], Global[UUID]]] = Field(
+    route_policy: Optional[Union[Default[None], Global[str], Global[UUID]]] = Field(
         serialization_alias="routePolicy", validation_alias="routePolicy", default=None
     )
 
@@ -120,7 +120,7 @@ class OspfParcel(_ParcelBase):
     type_: Literal["routing/ospf"] = Field(default="routing/ospf", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    router_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(
+    router_id: Optional[Union[Global[str], Global[IPv4Address], Variable, Default[None]]] = Field(
         validation_alias=AliasPath("data", "routerId"), default=None
     )
     reference_bandwidth: Optional[Union[Global[int], Variable, Default[int]]] = Field(
@@ -148,16 +148,20 @@ class OspfParcel(_ParcelBase):
     intra_area: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         validation_alias=AliasPath("data", "intraArea"), default=None
     )
-    delay: Optional[Union[Global[int], Variable, Default[int]]] = None
+    delay: Optional[Union[Global[int], Variable, Default[int]]] = Field(
+        validation_alias=AliasPath("data", "delay"), default=None
+    )
     initial_hold: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         validation_alias=AliasPath("data", "initialHold"), default=None
     )
     max_hold: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         validation_alias=AliasPath("data", "maxHold"), default=None
     )
-    redistribute: Optional[List[RedistributedRoute]] = None
+    redistribute: Optional[List[RedistributedRoute]] = Field(
+        validation_alias=AliasPath("data", "redistribute"), default=None
+    )
     router_lsa: Optional[List[RouterLsa]] = Field(validation_alias=AliasPath("data", "routerLsa"), default=None)
-    route_policy: Optional[Union[Default[None], Global[UUID]]] = Field(
+    route_policy: Optional[Union[Default[None], Global[str], Global[UUID]]] = Field(
         validation_alias=AliasPath("data", "routePolicy"), default=None
     )
     area: Optional[List[OspfArea]] = Field(validation_alias=AliasPath("data", "area"), default=None)

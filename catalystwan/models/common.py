@@ -179,3 +179,5 @@ ServiceChainNumber = Literal[
 ICMPMessageType = Literal[
     "echo", "echo-reply", "unreachable", "net-unreachable", "host-unreachable", "protocol-unreachable"
 ]
+
+MetricType = Literal["type1", "type2"]

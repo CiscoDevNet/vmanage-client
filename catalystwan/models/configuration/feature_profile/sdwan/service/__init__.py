@@ -3,6 +3,8 @@ from typing import List, Union
 from pydantic import Field
 from typing_extensions import Annotated
 
+from catalystwan.models.configuration.feature_profile.sdwan.service.ospf import OspfParcel
+
 from .appqoe import AppqoeParcel
 from .dhcp_server import LanVpnDhcpServerParcel
 from .lan.ethernet import InterfaceEthernetParcel
@@ -16,6 +18,7 @@ AnyTopLevelServiceParcel = Annotated[
         LanVpnDhcpServerParcel,
         AppqoeParcel,
         LanVpnParcel,
+        OspfParcel,
         # TrackerGroupData,
         # WirelessLanData,
         # SwitchportData
@@ -42,6 +45,7 @@ __all__ = [
     "LanVpnDhcpServerParcel",
     "AppqoeParcel",
     "LanVpnParcel",
+    "OspfParcel",
     "InterfaceSviParcel",
     "InterfaceGreParcel",
     "AnyServiceParcel",

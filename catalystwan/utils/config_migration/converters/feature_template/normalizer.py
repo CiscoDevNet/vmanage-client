@@ -2,7 +2,7 @@ from ipaddress import AddressValueError, IPv4Address, IPv4Interface, IPv6Address
 from typing import List, Optional, Union, get_args
 
 from catalystwan.api.configuration_groups.parcel import Global, as_global
-from catalystwan.models.common import TLOCColor
+from catalystwan.models.common import MetricType, TLOCColor
 from catalystwan.models.configuration.feature_profile.sdwan.service.dhcp_server import SubnetMask
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.common import (
     IkeCiphersuite,
@@ -16,6 +16,13 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ethernet
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import GreTunnelMode
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec import IpsecTunnelMode
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import Direction
+from catalystwan.models.configuration.feature_profile.sdwan.service.ospf import (
+    AdvertiseType,
+    AreaType,
+    AuthenticationType,
+    RedistributeProtocolOspf,
+)
+from catalystwan.models.configuration.feature_profile.sdwan.service.ospfv3 import NetworkType
 from catalystwan.models.configuration.feature_profile.sdwan.system.logging_parcel import (
     AuthType,
     CypherSuite,
@@ -45,6 +52,12 @@ CastableLiterals = Union[
     MediaType,
     NatType,
     IpsecTunnelMode,
+    NetworkType,
+    AuthenticationType,
+    AreaType,
+    AdvertiseType,
+    RedistributeProtocolOspf,
+    MetricType,
 ]
 
 CastedTypes = Union[

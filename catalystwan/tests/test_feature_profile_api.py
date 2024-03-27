@@ -9,16 +9,18 @@ from catalystwan.api.configuration_groups.parcel import Global, as_global, as_va
 from catalystwan.api.feature_profile_api import ServiceFeatureProfileAPI, SystemFeatureProfileAPI
 from catalystwan.endpoints.configuration.feature_profile.sdwan.service import ServiceFeatureProfile
 from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
-from catalystwan.models.configuration.feature_profile.sdwan.service import LanVpnDhcpServerParcel, LanVpnParcel
-from catalystwan.models.configuration.feature_profile.sdwan.service.appqoe import AppqoeParcel
-from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetParcel
-from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import BasicGre, InterfaceGreParcel
-from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec import (
+from catalystwan.models.configuration.feature_profile.sdwan.service import (
+    AppqoeParcel,
+    InterfaceEthernetParcel,
+    InterfaceGreParcel,
     InterfaceIpsecParcel,
-    IpsecAddress,
-    IpsecTunnelMode,
+    InterfaceSviParcel,
+    LanVpnDhcpServerParcel,
+    LanVpnParcel,
+    OspfParcel,
 )
-from catalystwan.models.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviParcel
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import BasicGre
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec import IpsecAddress, IpsecTunnelMode
 from catalystwan.models.configuration.feature_profile.sdwan.system import (
     AAAParcel,
     BannerParcel,
@@ -102,6 +104,7 @@ service_endpoint_mapping = {
     LanVpnDhcpServerParcel: "dhcp-server",
     AppqoeParcel: "appqoe",
     LanVpnParcel: "lan/vpn",
+    OspfParcel: "routing/ospf",
 }
 
 service_interface_parcels = [
