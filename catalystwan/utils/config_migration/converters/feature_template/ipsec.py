@@ -7,7 +7,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec im
 
 
 class InterfaceIpsecTemplateConverter:
-    supported_template_types = ("cisco_vpn_interface_ipsec",)
+    supported_template_types = ("cisco_vpn_interface_ipsec", "vpn-vedge-interface-ipsec")
 
     delete_keys = (
         "dead_peer_detection",

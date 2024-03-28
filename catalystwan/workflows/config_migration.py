@@ -182,6 +182,10 @@ def transform(ux1: UX1Config) -> UX2Config:
     for ft in ux1.templates.feature_templates:
         if ft.template_type in SUPPORTED_TEMPLATE_TYPES:
             parcel = create_parcel_from_template(ft)
+            # if isinstance(parcel, tuple):
+            #     for p in parcel:
+            # .....
+            # find uuid in
             transformed_parcel = TransformedParcel(
                 header=TransformHeader(
                     type=parcel._get_parcel_type(),

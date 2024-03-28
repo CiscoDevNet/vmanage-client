@@ -13,7 +13,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre impo
 
 
 class InterfaceGRETemplateConverter:
-    supported_template_types = ("cisco_vpn_interface_gre",)
+    supported_template_types = ("cisco_vpn_interface_gre", "vpn-vedge-interface-gre")
 
     tunnel_destination_ip4 = "{{gre_tunnelDestination_ip4}}"
 

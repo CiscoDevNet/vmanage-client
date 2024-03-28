@@ -1,11 +1,13 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
+from ipaddress import IPv4Address
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
+from catalystwan.models.common import MetricType
 from catalystwan.models.configuration.feature_profile.common import Prefix
 
 NetworkType = Literal[
@@ -40,7 +42,6 @@ RedistributeProtocolIPv6 = Literal[
     "omp",
     "eigrp",
 ]
-MetricType = Literal["type1", "type2"]
 
 
 class NoAuth(BaseModel):
@@ -171,7 +172,7 @@ class Ospfv3IPv6Area(BaseModel):
         serialization_alias="areaTypeConfig", validation_alias="areaTypeConfig", default=None
     )
     interfaces: List[Ospfv3InterfaceParametres]
-    ranges: Optional[List[SummaryRoute]] = None
+    ranges: Optional[List[SummaryRouteIPv6]] = None
 
 
 class MaxMetricRouterLsa(BaseModel):
@@ -210,7 +211,9 @@ class DefaultOriginate(BaseModel):
     originate: Union[Global[bool], Default[bool]]
     always: Optional[Union[Global[bool], Variable, Default[bool]]] = None
     metric: Optional[Union[Global[str], Variable, Default[None]]] = None
-    metricType: Optional[Union[Global[MetricType], Variable, Default[None]]] = None
+    metric_type: Optional[Union[Global[MetricType], Variable, Default[None]]] = Field(
+        default=None, serialization_alias="metricType", validation_alias="metricType"
+    )
 
 
 class SpfTimers(BaseModel):
@@ -243,7 +246,7 @@ class AdvancedOspfv3Attributes(BaseModel):
 class BasicOspfv3Attributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    router_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(
+    router_id: Optional[Union[Global[str], Global[IPv4Address], Variable, Default[None]]] = Field(
         serialization_alias="routerId", validation_alias="routerId", default=None
     )
     distance: Optional[Union[Global[int], Variable, Default[int]]] = None
@@ -264,13 +267,13 @@ class Ospfv3IPv4Parcel(_ParcelBase):
 
     basic: Optional[BasicOspfv3Attributes] = Field(default=None, validation_alias=AliasPath("data", "basic"))
     advanced: Optional[AdvancedOspfv3Attributes] = Field(default=None, validation_alias=AliasPath("data", "advanced"))
-    redistribute: Optional[RedistributedRouteIPv6] = Field(
+    redistribute: Optional[List[RedistributedRoute]] = Field(
         default=None, validation_alias=AliasPath("data", "redistribute")
     )
     max_metric_router_lsa: Optional[MaxMetricRouterLsa] = Field(
         validation_alias=AliasPath("data", "maxMetricRouterLsa"), default=None
     )
-    area: List[Ospfv3IPv6Area] = Field(validation_alias=AliasPath("data", "area"))
+    area: List[Ospfv3IPv4Area] = Field(validation_alias=AliasPath("data", "area"))
 
 
 class Ospfv3IPv6Parcel(_ParcelBase):
@@ -279,7 +282,7 @@ class Ospfv3IPv6Parcel(_ParcelBase):
 
     basic: Optional[BasicOspfv3Attributes] = Field(default=None, validation_alias=AliasPath("data", "basic"))
     advanced: Optional[AdvancedOspfv3Attributes] = Field(default=None, validation_alias=AliasPath("data", "advanced"))
-    redistribute: Optional[RedistributedRouteIPv6] = Field(
+    redistribute: Optional[List[RedistributedRouteIPv6]] = Field(
         default=None, validation_alias=AliasPath("data", "redistribute")
     )
     max_metric_router_lsa: Optional[MaxMetricRouterLsa] = Field(
