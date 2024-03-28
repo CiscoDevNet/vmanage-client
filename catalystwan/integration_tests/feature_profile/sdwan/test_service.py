@@ -16,6 +16,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec im
 )
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnParcel
+from catalystwan.models.configuration.feature_profile.sdwan.service.ospf import OspfParcel
 
 
 class TestServiceFeatureProfileModels(TestFeatureProfileModels):
@@ -48,6 +49,17 @@ class TestServiceFeatureProfileModels(TestFeatureProfileModels):
         )
         # Act
         parcel_id = self.api.create_parcel(self.profile_uuid, vpn_parcel).id
+        # Assert
+        assert parcel_id
+
+    def test_when_default_values_ospf_parcel_expect_successful_post(self):
+        # Arrange
+        ospf_parcel = OspfParcel(
+            parcel_name="TestOspfParcel",
+            parcel_description="Test Ospf Parcel",
+        )
+        # Act
+        parcel_id = self.api.create_parcel(self.profile_uuid, ospf_parcel).id
         # Assert
         assert parcel_id
 
