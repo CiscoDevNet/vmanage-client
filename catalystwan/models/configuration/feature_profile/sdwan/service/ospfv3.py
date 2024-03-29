@@ -1,6 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv6Interface
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
@@ -95,9 +95,9 @@ class Ospfv3InterfaceParametres(BaseModel):
 class SummaryRouteIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
-    network: Union[Global[str], Variable]
+    network: Union[Global[str], Global[IPv6Interface], Variable]
     no_advertise: Union[Global[bool], Variable, Default[bool]] = Field(
-        serialization_alias="noAdvertise", validation_alias="noAdvertise"
+        serialization_alias="noAdvertise", validation_alias="noAdvertise", default=Default[bool](value=False)
     )
     cost: Optional[Union[Global[int], Variable, Default[None]]] = None
 
@@ -160,7 +160,7 @@ class Ospfv3IPv4Area(BaseModel):
     area_type_config: Optional[Union[StubArea, NssaArea, NormalArea, DefaultArea]] = Field(
         serialization_alias="areaTypeConfig", validation_alias="areaTypeConfig", default=None
     )
-    interfaces: List[Ospfv3InterfaceParametres]
+    interfaces: List[Ospfv3InterfaceParametres] = Field(min_length=1)
     ranges: Optional[List[SummaryRoute]] = None
 
 
@@ -171,7 +171,7 @@ class Ospfv3IPv6Area(BaseModel):
     area_type_config: Optional[Union[StubArea, NssaArea, NormalArea, DefaultArea]] = Field(
         serialization_alias="areaTypeConfig", validation_alias="areaTypeConfig", default=None
     )
-    interfaces: List[Ospfv3InterfaceParametres]
+    interfaces: List[Ospfv3InterfaceParametres] = Field(min_length=1)
     ranges: Optional[List[SummaryRouteIPv6]] = None
 
 

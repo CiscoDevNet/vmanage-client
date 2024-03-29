@@ -17,6 +17,13 @@ from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec im
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service.ospf import OspfParcel
+from catalystwan.models.configuration.feature_profile.sdwan.service.ospfv3 import (
+    Ospfv3InterfaceParametres,
+    Ospfv3IPv4Area,
+    Ospfv3IPv4Parcel,
+    Ospfv3IPv6Area,
+    Ospfv3IPv6Parcel,
+)
 
 
 class TestServiceFeatureProfileModels(TestFeatureProfileModels):
@@ -60,6 +67,40 @@ class TestServiceFeatureProfileModels(TestFeatureProfileModels):
         )
         # Act
         parcel_id = self.api.create_parcel(self.profile_uuid, ospf_parcel).id
+        # Assert
+        assert parcel_id
+
+    def test_when_default_ospfv3_ipv4_expect_successful_post(self):
+        # Arrange
+        ospfv3ipv4_parcel = Ospfv3IPv4Parcel(
+            parcel_name="TestOspfv3ipv4",
+            parcel_description="Test Ospfv3ipv4 Parcel",
+            area=[
+                Ospfv3IPv4Area(
+                    area_number=as_global(5),
+                    interfaces=[Ospfv3InterfaceParametres(name=as_global("GigabitEthernet0/0/0"))],
+                )
+            ],
+        )
+        # Act
+        parcel_id = self.api.create_parcel(self.profile_uuid, ospfv3ipv4_parcel).id
+        # Assert
+        assert parcel_id
+
+    def test_when_default_ospfv3_ipv6_expect_successful_post(self):
+        # Arrange
+        ospfv3ipv4_parcel = Ospfv3IPv6Parcel(
+            parcel_name="TestOspfv3ipv6",
+            parcel_description="Test Ospfv3ipv6 Parcel",
+            area=[
+                Ospfv3IPv6Area(
+                    area_number=as_global(7),
+                    interfaces=[Ospfv3InterfaceParametres(name=as_global("GigabitEthernet0/0/0"))],
+                )
+            ],
+        )
+        # Act
+        parcel_id = self.api.create_parcel(self.profile_uuid, ospfv3ipv4_parcel).id
         # Assert
         assert parcel_id
 
