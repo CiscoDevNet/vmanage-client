@@ -17,9 +17,9 @@ jobs:
         run: |
           curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
           sudo apt-get install -y nodejs
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
       - name: Set Up Poetry
