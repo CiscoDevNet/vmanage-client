@@ -259,7 +259,8 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         self.logger.info(
             f"Logged to vManage({self.platform_version}) as {self.username}. The session type is {self.session_type}"
         )
-        self.cookies.set("JSESSIONID", self.auth.set_cookie.get("JSESSIONID"))
+        if jsessionid := self.auth.set_cookie.get("JSESSIONID"):
+            self.cookies.set("JSESSIONID", jsessionid)
         return self
 
     def wait_server_ready(self, timeout: int, poll_period: int = 10) -> None:
