@@ -1,11 +1,10 @@
 [tool.poetry]
 name = "vmngclient"
-version = "0.22.0"
+version = "0.22.1"
 description = "vManage SDK for Python"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"
 repository = "https://github.com/CiscoDevNet/vManage-client"
-
 [tool.poetry.dependencies]
 python = "^3.8.0"
 requests = "^2.27.1"
@@ -18,7 +17,7 @@ flake8-quotes = "^3.3.1"
 clint = "^0.5.1"
 requests-toolbelt = "^1.0.0"
 packaging = "^23.0"
-pydantic = "2.5"
+pydantic = "^2.5"
 
 [tool.poetry.dev-dependencies]
 parameterized = "^0.8.1"
