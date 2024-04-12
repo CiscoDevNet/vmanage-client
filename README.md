@@ -1,3 +1,7 @@
+# REPOSITORY MOVED TO NEW ORIGIN !
+https://github.com/cisco-open/cisco-catalyst-wan-sdk
+
+
 <p align="center">
   <a href="#"><img src="docs/images/catalystwan.svg" alt="Cisco Catalyst WAN SDK Logo" style="height:150px" />
 </p>
